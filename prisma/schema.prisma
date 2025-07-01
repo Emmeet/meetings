@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model customer_info {
+  id                   Int      @id @default(autoincrement()) @db.UnsignedInt
+  first_name           String?  @db.VarChar(255)
+  middle_name          String?  @db.VarChar(255)
+  last_name            String?  @db.VarChar(255)
+  email                String?  @db.VarChar(255)
+  phone                String?  @db.VarChar(255)
+  affiliation          String?  @db.VarChar(255)
+  position             String?  @db.VarChar(255)
+  type                 Int?     @db.TinyInt
+  paper_number         String?  @db.VarChar(255)
+  have_visa            Int?     @db.TinyInt
+  dietary_requirements String?  @db.VarChar(255)
+  intent_id            String?  @db.VarChar(255)
+  status               Int?     @default(0) @db.TinyInt
+  invoice_no           Int?
+  create_date          String?  @db.VarChar(255)
+  line1                String?  @db.VarChar(255)
+  line2                String?  @db.VarChar(255)
+  city                 String?  @db.VarChar(255)
+  state                String?  @db.VarChar(255)
+  postal_code          String?  @db.VarChar(255)
+  country              String?  @db.VarChar(255)
+  other_explain        String?  @db.VarChar(255)
+  attendee_name        String?  @db.VarChar(255)
+
+  @@map("customer_info")
+}
+
+model payment_log {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  content     String?   @db.Text
+  type        Int?
+  create_time DateTime? @updatedAt @db.DateTime(0)
+
+  @@map("payment_log")
+}
