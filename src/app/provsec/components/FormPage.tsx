@@ -126,7 +126,7 @@ export function FormPage() {
 
       setIsSubmitted(true);
       window.location.href = `${
-        process.env.STRIPE_PAYMENT_LINK as string
+        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK as string
       }?client_reference_id=${customerId}&prefilled_email=${values.email}`;
     } catch (error) {
       console.error("An error occurred:", error);
