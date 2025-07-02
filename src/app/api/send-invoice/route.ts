@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from "next/server";
 import { render } from "@react-email/render";
 import { AustralianInvoice } from "@/components/AustralianInvoice";
 import nodemailer from "nodemailer";
-import { pdfService } from "@/lib/pdf-service";
 
 // 创建SMTP传输器
 const createTransporter = () => {
