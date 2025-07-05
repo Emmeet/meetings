@@ -1,65 +1,52 @@
 FROM node:22-alpine3.19 AS base
+RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm
 
-# 安装依赖阶段
-FROM base AS deps
-# 检查 https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine 了解为什么需要 libc6-compat
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 复制 package.json 和 lock 文件
+# 只复制依赖相关文件，提升缓存利用率
 COPY package.json pnpm-lock.yaml* ./
 COPY prisma ./prisma/
 
-# 安装依赖
+# 安装所有依赖（包括devDependencies，保证prisma可用）
 RUN pnpm install --frozen-lockfile
 
-# 构建阶段
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# 复制全部源代码
 COPY . .
 
 # 生成 Prisma 客户端
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 
 # 构建应用
 RUN pnpm run build
 
-# 生产阶段
-FROM base AS runner
+# 生产镜像
+FROM node:22-alpine3.19 AS runner
+RUN apk add --no-cache libc6-compat
+RUN npm install -g pnpm
+
 WORKDIR /app
 
 ENV NODE_ENV production
-# 创建非 root 用户
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# 复制构建产物和必要文件
-COPY --from=builder /app/public ./public
+# 只复制生产依赖
+COPY --from=base /app/node_modules ./node_modules
+RUN pnpm prune --prod
 
-# 设置正确的权限
+# 复制构建产物和必要文件
+COPY --from=base /app/public ./public
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
-
-# 自动利用输出跟踪来复制必要的文件
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# 复制 Prisma 相关文件
-COPY --from=builder /app/prisma ./prisma
-
-# 只保留生产依赖
-COPY --from=deps /app/node_modules ./node_modules
-RUN pnpm prune --prod
+COPY --from=base --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=base --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=base /app/prisma ./prisma
 
 USER nextjs
 
 EXPOSE 4000
-
 ENV PORT 4000
 ENV HOSTNAME "0.0.0.0"
 
-# 启动应用
 CMD ["node", "server.js"]
