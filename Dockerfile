@@ -1,4 +1,5 @@
 FROM node:22-alpine3.19 AS base
+RUN npm install -g pnpm
 
 # 安装依赖阶段
 FROM base AS deps
@@ -11,7 +12,7 @@ COPY package.json pnpm-lock.yaml* ./
 COPY prisma ./prisma/
 
 # 安装依赖
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # 构建阶段
 FROM base AS builder
@@ -52,7 +53,7 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # 只保留生产依赖
 COPY --from=deps /app/node_modules ./node_modules
-RUN npm install -g pnpm && pnpm prune --prod
+RUN pnpm prune --prod
 
 USER nextjs
 
