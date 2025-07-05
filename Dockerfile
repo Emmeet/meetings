@@ -49,7 +49,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # 复制 Prisma 相关文件
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # 只保留生产依赖
 COPY --from=deps /app/node_modules ./node_modules
