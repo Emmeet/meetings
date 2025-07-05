@@ -1,5 +1,4 @@
-# 使用官方 Node.js 18 Alpine 镜像作为基础镜像
-FROM node:18-alpine AS base
+FROM node:22-alpine3.19 AS base
 
 # 安装依赖阶段
 FROM base AS deps
@@ -12,7 +11,7 @@ COPY package.json package-lock.json* pnpm-lock.yaml* ./
 COPY prisma ./prisma/
 
 # 安装依赖
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
 
 # 构建阶段
 FROM base AS builder
@@ -24,7 +23,7 @@ COPY . .
 RUN npx prisma generate
 
 # 构建应用
-RUN npm run build
+RUN pnpm run build
 
 # 生产阶段
 FROM base AS runner
