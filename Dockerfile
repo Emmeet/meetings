@@ -33,8 +33,6 @@ RUN adduser --system --uid 1001 nextjs
 
 # 只复制生产依赖
 COPY --from=base /app/node_modules ./node_modules
-RUN pnpm prune --prod
-
 # 复制构建产物和必要文件
 COPY --from=base /app/public ./public
 RUN mkdir .next
