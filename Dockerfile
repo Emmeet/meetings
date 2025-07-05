@@ -7,11 +7,11 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # 复制 package.json 和 lock 文件
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* ./
 COPY prisma ./prisma/
 
 # 安装依赖
-RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 # 构建阶段
 FROM base AS builder
@@ -49,6 +49,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # 复制 Prisma 相关文件
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# 只保留生产依赖
+COPY --from=deps /app/node_modules ./node_modules
+RUN npm install -g pnpm && pnpm prune --prod
 
 USER nextjs
 
