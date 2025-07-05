@@ -1,4 +1,4 @@
-import CustomerTable from "../provsec/components/CustomerTable";
+import CustomerTable from "../raid/components/CustomerTable";
 
 export default function CustomersPage() {
   return (

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { CheckCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +13,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -32,7 +30,6 @@ const formSchema = z.object({
     message: "Please enter a valid email address",
   }),
   affiliation: z.string().min(1, "This field is required."),
-  position: z.string().min(1, "This field is required."),
   phone: z.string().optional(),
   type: z.enum(["1", "2"], {
     message: "You need to select a type.",
@@ -58,7 +55,6 @@ export function FormPage() {
       middleName: "",
       lastName: "",
       affiliation: "",
-      position: "",
       email: "",
       phone: "",
       type: undefined,
@@ -97,7 +93,6 @@ export function FormPage() {
       email: values.email,
       phone: values.phone,
       affiliation: values.affiliation,
-      position: values.position,
       type: Number(values.type),
       paper_number: values.paperNumber,
       have_visa: Number(values.haveVisa),
@@ -124,7 +119,7 @@ export function FormPage() {
       const customerId = result.id;
 
       window.location.href = `${
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK as string
+        getPaymentLink(values.type) as string
       }?client_reference_id=${customerId}&prefilled_email=${values.email}`;
     } catch (error) {
       console.error("An error occurred:", error);
@@ -132,6 +127,44 @@ export function FormPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // 价格计算逻辑
+  function getCurrentPrice(type: string | undefined) {
+    // 澳大利亚东部标准时间（AEST, UTC+10）
+    const now = new Date();
+    // 获取当前UTC时间，转换为AEST
+    const nowAEST = new Date(
+      now.getTime() + 10 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000
+    );
+    // 截止时间：2025-08-15 00:00:00 AEST
+    const deadlineAEST = new Date(Date.UTC(2025, 7, 14, 14, 0, 0)); // 8月是7，14号14点UTC=15号0点AEST
+    let price = 0;
+    if (type === "1") {
+      price = nowAEST < deadlineAEST ? 1450 : 1550;
+    } else if (type === "2") {
+      price = nowAEST < deadlineAEST ? 1350 : 1450;
+    }
+    return price;
+  }
+
+  // 支付链接逻辑
+  function getPaymentLink(type: string | undefined) {
+    const now = new Date();
+    const nowAEST = new Date(
+      now.getTime() + 10 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000
+    );
+    const deadlineAEST = new Date(Date.UTC(2025, 7, 14, 14, 0, 0));
+    if (type === "1") {
+      return nowAEST < deadlineAEST
+        ? process.env.NEXT_PUBLIC_STRIPE_PAPER_PAYMENT_LINK1
+        : process.env.NEXT_PUBLIC_STRIPE_PAPER_PAYMENT_LINK2;
+    } else if (type === "2") {
+      return nowAEST < deadlineAEST
+        ? process.env.NEXT_PUBLIC_STRIPE_POST_PAYMENT_LINK1
+        : process.env.NEXT_PUBLIC_STRIPE_POST_PAYMENT_LINK2;
+    }
+    return "";
   }
 
   const items = [
@@ -167,8 +200,8 @@ export function FormPage() {
         <Card className="bg-white shadow-lg border-slate-200">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl font-bold text-slate-800 text-center">
-              The 18th International Conference on Provable and Practical
-              Security
+              The 28th International Symposium on Research in Attacks,
+              Intrusions and Defenses (RAID 2025)
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -233,22 +266,10 @@ export function FormPage() {
                           Affiliation (Organisation/University/Company)
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your position" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="position"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Job Title or Academic Position</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter your position" {...field} />
+                          <Input
+                            placeholder="Enter your affiliation"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -317,7 +338,7 @@ export function FormPage() {
                                 <RadioGroupItem value="1" />
                               </FormControl>
                               <FormLabel className="font-normal">
-                                Author
+                                Paper Author Registration
                               </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
@@ -325,7 +346,7 @@ export function FormPage() {
                                 <RadioGroupItem value="2" />
                               </FormControl>
                               <FormLabel className="font-normal">
-                                Non-Author
+                                Poster Author and Non Author Registration
                               </FormLabel>
                             </FormItem>
                           </RadioGroup>
@@ -335,26 +356,6 @@ export function FormPage() {
                     )}
                   />
                 </div>
-                {type === "1" && (
-                  <div className="grid md:grid-cols-1 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="paperNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Paper number</FormLabel>
-                          <FormControl>
-                            <Input type="text" {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            For Author registration
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
                 <div className="grid md:grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
@@ -461,10 +462,23 @@ export function FormPage() {
                 )}
                 <div className="text-center space-y-2 mb-6">
                   <div className="text-slate-700">
-                    ProvSec 2024 Registration Fee (Including Tax and Transaction
+                    Raid 2025 Registration Fee (Including Tax and Transaction
                     Fee)
                   </div>
-                  <div className="text-2xl font-bold">AU$1,350.00</div>
+                  <div className="text-2xl font-bold">
+                    {type
+                      ? `AU$${getCurrentPrice(type).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
+                      : "--"}
+                  </div>
+                  <div className="text-slate-700">
+                    Additional tickets for Cocktail Reception, Gala Dinner and
+                    Sea World Theme Park Day Pass at conference special rate can
+                    be purchased during check out (Please click view all to see
+                    all options at once)
+                  </div>
                 </div>
                 <Button
                   type="submit"

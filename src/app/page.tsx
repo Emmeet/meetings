@@ -1,4 +1,4 @@
-import { FormPage } from "./provsec/components/FormPage";
+import { FormPage } from "./raid/components/FormPage";
 
 export default function page() {
   return (

@@ -30,11 +30,31 @@ interface CustomerDetails {
   address: StripeAddress | null;
 }
 
+interface PaymentItem {
+  name: string;
+  amount: string;
+  quantity: number;
+}
+
+interface InvoiceData {
+  invoiceNumber: string;
+  name: string;
+  email: string | null;
+  country: string;
+  state: string;
+  city: string;
+  postalCode: string;
+  line1: string;
+  line2: string;
+  payments: PaymentItem[];
+  subTotal: string;
+  tax: string;
+  total: string;
+}
+
 async function updateCustomerInfo(
   clientReferenceId: string,
-  email: string,
-  address: StripeAddress,
-  attendeeName: string
+  address: StripeAddress
 ) {
   try {
     await prisma.customer_info.update({
@@ -49,7 +69,6 @@ async function updateCustomerInfo(
         state: address.state || null,
         postal_code: address.postal_code || null,
         country: address.country || null,
-        attendee_name: attendeeName,
       },
     });
   } catch (error) {
@@ -87,56 +106,115 @@ export async function POST(request: NextRequest) {
     case "checkout.session.completed":
       const session = event.data.object;
       console.log("Checkout session completed:", session.id);
-      if (session.payment_link === (process.env.PAYMENT_LINK_id as string)) {
-        console.log("报名费用处理");
-        // 保存报名费用的支付日志
-        await savePaymentLog(JSON.stringify(session), 1);
+      console.log("报名费用处理");
+      console.log(session);
+      // 保存报名费用的支付日志
+      await savePaymentLog(JSON.stringify(session), 1);
 
-        // 获取客户信息
-        const clientReferenceId = session.client_reference_id;
-        const customerDetails: CustomerDetails = session.customer_details || {
-          email: null,
-          address: null,
-        };
-        const email = customerDetails.email || "";
-        const address = customerDetails.address || {};
+      // 获取客户信息
+      const clientReferenceId = session.client_reference_id;
 
-        // 获取参会者姓名
-        let attendeeName = "";
-        if (
-          session.custom_fields &&
-          session.custom_fields.length > 0 &&
-          session.custom_fields[0].text
-        ) {
-          // 如果有自定义字段，使用自定义字段中的姓名
-          attendeeName = session.custom_fields[0].text.value || "";
-        }
+      const customerDetails: CustomerDetails = session.customer_details || {
+        email: null,
+        address: null,
+      };
+      const address = customerDetails.address || {};
 
-        if (!attendeeName && clientReferenceId) {
-          // 如果没有自定义字段中的姓名，从数据库中获取并组合姓名
-          const customer = await prisma.customer_info.findUnique({
-            where: {
-              id: parseInt(clientReferenceId),
-            },
-          });
-          if (customer) {
-            const middleName = customer.middle_name
-              ? ` ${customer.middle_name} `
-              : " ";
-            attendeeName = `${customer.first_name || ""}${middleName}${
-              customer.last_name || ""
-            }`;
-          }
-        }
-
-        // 更新客户信息
-        if (clientReferenceId && attendeeName) {
-          await updateCustomerInfo(
-            clientReferenceId,
-            email,
-            address,
-            attendeeName
+      if (clientReferenceId) {
+        // 如果没有自定义字段中的姓名，从数据库中获取并组合姓名
+        const customer = await prisma.customer_info.findUnique({
+          where: {
+            id: parseInt(clientReferenceId),
+          },
+        });
+        if (customer) {
+          // 更新客户信息
+          await updateCustomerInfo(clientReferenceId, address);
+          // 查询付款详情
+          const lineItems = await stripe.checkout.sessions.listLineItems(
+            session.id
           );
+          // 计算总金额（以分为单位）
+          let totalAmountInCents = 0;
+          if (lineItems.data.length > 0) {
+            lineItems.data.forEach((item) => {
+              totalAmountInCents +=
+                (item.amount_total || 0) * (item.quantity || 1);
+            });
+          }
+
+          // 计算税前金额、税额和总金额
+          const totalAmountInDollars = totalAmountInCents / 100;
+          const subtotalInDollars = totalAmountInDollars / 1.1; // 从含税价格反推税前价格
+          const taxInDollars = totalAmountInDollars - subtotalInDollars;
+
+          // 格式化金额
+          const formatCurrency = (amount: number) => {
+            return new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(amount);
+          };
+
+          let invoiceData: InvoiceData = {
+            invoiceNumber: clientReferenceId,
+            name: `${customer.first_name}${
+              customer.middle_name ? " " + customer.middle_name : ""
+            } ${customer.last_name}`,
+            email: customer.email,
+            country: address.country || "",
+            state: address.state || "",
+            city: address.city || "",
+            postalCode: address.postal_code || "",
+            line1: address.line1 || "",
+            line2: address.line2 || "",
+            payments: [],
+            subTotal: formatCurrency(subtotalInDollars),
+            tax: formatCurrency(taxInDollars),
+            total: formatCurrency(totalAmountInDollars),
+          };
+
+          if (lineItems.data.length > 0) {
+            lineItems.data.forEach((item) => {
+              // 将 Stripe 金额（以分为单位）转换为美元并格式化
+              const amountInDollars = (item.amount_total || 0) / 100;
+              const formattedAmount = formatCurrency(amountInDollars);
+
+              invoiceData.payments.push({
+                name: item.description || "",
+                amount: formattedAmount,
+                quantity: item.quantity || 0,
+              });
+            });
+          }
+
+          // 发送发票数据到邮件服务
+          try {
+            const response = await fetch(
+              "https://email-service.anseninnov.au/send/invoice",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(invoiceData),
+              }
+            );
+
+            if (!response.ok) {
+              console.error(
+                "Failed to send invoice:",
+                response.status,
+                response.statusText
+              );
+            } else {
+              console.log("Invoice sent successfully");
+            }
+          } catch (error) {
+            console.error("Error sending invoice:", error);
+          }
         }
       }
       // 处理完成的结账会话
