@@ -65,6 +65,8 @@ export function FormPage() {
     },
   });
 
+  console.log(process.env.NEXT_PUBLIC_STRIPE_PAPER_PAYMENT_LINK1);
+
   // 监听表单值的变化
   const type = form.watch("type");
   const dietaryRequirements = form.watch("dietaryRequirements");
