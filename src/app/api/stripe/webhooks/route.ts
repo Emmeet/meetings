@@ -59,7 +59,8 @@ interface InvoiceData {
 
 async function updateCustomerInfo(
   clientReferenceId: string,
-  address: StripeAddress
+  address: StripeAddress,
+  attendeeName: string
 ) {
   try {
     await prisma.customer_info.update({
@@ -74,6 +75,7 @@ async function updateCustomerInfo(
         state: address.state || null,
         postal_code: address.postal_code || null,
         country: address.country || null,
+        attendee_name: attendeeName,
       },
     });
   } catch (error) {
@@ -122,6 +124,17 @@ export async function POST(request: NextRequest) {
       };
       const address = customerDetails.address || {};
 
+      // 获取参会者姓名
+      let attendeeName = "";
+      if (
+        session.custom_fields &&
+        session.custom_fields.length > 0 &&
+        session.custom_fields[0].text
+      ) {
+        // 如果有自定义字段，使用自定义字段中的姓名
+        attendeeName = session.custom_fields[0].text.value || "";
+      }
+
       if (clientReferenceId) {
         // 保存报名费用的支付日志
         await savePaymentLog(
@@ -137,7 +150,7 @@ export async function POST(request: NextRequest) {
         });
         if (customer) {
           // 更新客户信息
-          await updateCustomerInfo(clientReferenceId, address);
+          await updateCustomerInfo(clientReferenceId, address, attendeeName);
           // 查询付款详情
           const lineItems = await stripe.checkout.sessions.listLineItems(
             session.id
