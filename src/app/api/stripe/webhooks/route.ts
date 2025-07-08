@@ -49,8 +49,8 @@ interface InvoiceData {
   state: string;
   city: string;
   postalCode: string;
-  line1: string;
-  line2: string;
+  addressLine1: string;
+  addressLine2: string;
   payments: PaymentItem[];
   subTotal: string;
   tax: string;
@@ -189,8 +189,8 @@ export async function POST(request: NextRequest) {
             state: address.state || "",
             city: address.city || "",
             postalCode: address.postal_code || "",
-            line1: address.line1 || "",
-            line2: address.line2 || "",
+            addressLine1: address.line1 || "",
+            addressLine2: address.line2 || "",
             payments: [],
             subTotal: formatCurrency(subtotalInDollars),
             tax: formatCurrency(taxInDollars),
