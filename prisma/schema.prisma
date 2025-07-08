@@ -39,6 +39,7 @@ model customer_info {
 
 model payment_log {
   id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  customer_id Int?
   content     String?   @db.Text
   type        Int?
   create_time DateTime? @updatedAt @db.DateTime(0)

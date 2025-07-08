@@ -2,12 +2,17 @@ import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-async function savePaymentLog(content: string, type: number) {
+async function savePaymentLog(
+  content: string,
+  type: number,
+  customer_id: number
+) {
   try {
     await prisma.payment_log.create({
       data: {
         content,
         type,
+        customer_id,
         create_time: new Date(),
       },
     });
@@ -107,9 +112,6 @@ export async function POST(request: NextRequest) {
       const session = event.data.object;
       console.log("Checkout session completed:", session.id);
       console.log("报名费用处理");
-      console.log(session);
-      // 保存报名费用的支付日志
-      await savePaymentLog(JSON.stringify(session), 1);
 
       // 获取客户信息
       const clientReferenceId = session.client_reference_id;
@@ -121,6 +123,12 @@ export async function POST(request: NextRequest) {
       const address = customerDetails.address || {};
 
       if (clientReferenceId) {
+        // 保存报名费用的支付日志
+        await savePaymentLog(
+          JSON.stringify(session),
+          1,
+          parseInt(clientReferenceId)
+        );
         // 如果没有自定义字段中的姓名，从数据库中获取并组合姓名
         const customer = await prisma.customer_info.findUnique({
           where: {
@@ -177,6 +185,11 @@ export async function POST(request: NextRequest) {
           };
 
           if (lineItems.data.length > 0) {
+            await savePaymentLog(
+              JSON.stringify(lineItems),
+              4,
+              parseInt(clientReferenceId)
+            );
             lineItems.data.forEach((item) => {
               // 将 Stripe 金额（以分为单位）转换为美元并格式化
               const amountInDollars = (item.amount_total || 0) / 100;

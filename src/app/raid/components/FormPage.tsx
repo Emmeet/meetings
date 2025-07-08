@@ -34,9 +34,6 @@ const formSchema = z.object({
   type: z.enum(["1", "2"], {
     message: "You need to select a type.",
   }),
-  haveVisa: z.enum(["0", "1"], {
-    message: "You need to select a visa type.",
-  }),
   dietaryRequirements: z
     .array(z.string())
     .refine((value) => value.some((item) => item), {
@@ -59,13 +56,10 @@ export function FormPage() {
       phone: "",
       type: undefined,
       paperNumber: "",
-      haveVisa: undefined,
       dietaryRequirements: [],
       otherExplain: "",
     },
   });
-
-  console.log(process.env.NEXT_PUBLIC_STRIPE_PAPER_PAYMENT_LINK1);
 
   // 监听表单值的变化
   const type = form.watch("type");
@@ -97,7 +91,6 @@ export function FormPage() {
       affiliation: values.affiliation,
       type: Number(values.type),
       paper_number: values.paperNumber,
-      have_visa: Number(values.haveVisa),
       dietary_requirements: dietaryString,
       other_explain: values.otherExplain,
     };
@@ -330,6 +323,12 @@ export function FormPage() {
                           Registration Type (Each paper needs at least one
                           registration from one author)
                         </FormLabel>
+                        {/* 副标题 */}
+                        <div className="text-sm text-muted-foreground mb-2">
+                          (Full conference attendance, Reception, Gala Dinner
+                          and Sea World Theme Park Day Pass at conference
+                          special rate for social event are included)
+                        </div>
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
@@ -358,41 +357,6 @@ export function FormPage() {
                     )}
                   />
                 </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="haveVisa"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>
-                          Do you need an invitation letter to apply for an
-                          Australian Visa?
-                        </FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="1" />
-                              </FormControl>
-                              <FormLabel className="font-normal">Yes</FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="0" />
-                              </FormControl>
-                              <FormLabel className="font-normal">No</FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
                 <div className="grid md:grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
@@ -480,6 +444,13 @@ export function FormPage() {
                     Sea World Theme Park Day Pass at conference special rate can
                     be purchased during check out (Please click view all to see
                     all options at once)
+                    <br />
+                    Please contactraid25.general.chairs@gmail.com for conference
+                    inquiries.
+                    <br />
+                    The 28th International Symposium on Research in Attacks,
+                    Intrusions and Defenses (RAID 2025) (19 OCT - 22 OCT 2025,
+                    Gold Coast, Australia)
                   </div>
                 </div>
                 <Button
@@ -487,7 +458,7 @@ export function FormPage() {
                   className="w-full cursor-pointer"
                   disabled={loading}
                 >
-                  {loading ? "Submitting..." : "Submit and Pay"}
+                  {loading ? "Submitting..." : "Next"}
                 </Button>
               </form>
             </Form>
