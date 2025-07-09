@@ -98,6 +98,8 @@ export function FormPage() {
   // Form submission handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    // 先打开一个空窗口
+    const newWindow = window.open("", "_blank");
     const dietaryLabels = values.dietaryRequirements
       .map((id) => {
         const item = items.find((i) => i.id === id);
@@ -146,11 +148,12 @@ export function FormPage() {
       const customerId = result.id;
 
       setIsSubmitted(true);
-      window.open(
-        `${
-          getPaymentLink(values.type) as string
-        }?client_reference_id=${customerId}&prefilled_email=${values.email}`
-      );
+      // 在新窗口跳转
+      if (newWindow) {
+        newWindow.location.href = `${getPaymentLink(
+          values.type
+        )}?client_reference_id=${customerId}&prefilled_email=${values.email}`;
+      }
     } catch (error) {
       console.error("An error occurred:", error);
       // You might want to show an error message to the user here
@@ -629,13 +632,13 @@ function SuccessMessage() {
         Thank you for your submission. Our team will contact you shortly to
         provide professional security service consultation.
       </p>
-      <Button
+      {/* <Button
         onClick={() => window.location.reload()}
         variant="outline"
         className="mx-auto"
       >
         Return to Form
-      </Button>
+      </Button> */}
     </Card>
   );
 }
