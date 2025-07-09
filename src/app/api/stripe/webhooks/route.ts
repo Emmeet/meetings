@@ -250,5 +250,5 @@ export async function POST(request: NextRequest) {
       console.log(`Unhandled event type: ${event.type}`);
   }
 
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true, status: 200 });
 }

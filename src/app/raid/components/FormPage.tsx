@@ -196,7 +196,8 @@ export function FormPage() {
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl font-bold text-slate-800 text-center">
               The 28th International Symposium on Research in Attacks,
-              Intrusions and Defenses (RAID 2025)
+              Intrusions and Defenses (RAID 2025) (19 OCT - 22 OCT 2025, Gold
+              Coast, Australia)
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -447,10 +448,6 @@ export function FormPage() {
                     <br />
                     Please contactraid25.general.chairs@gmail.com for conference
                     inquiries.
-                    <br />
-                    The 28th International Symposium on Research in Attacks,
-                    Intrusions and Defenses (RAID 2025) (19 OCT - 22 OCT 2025,
-                    Gold Coast, Australia)
                   </div>
                 </div>
                 <Button
