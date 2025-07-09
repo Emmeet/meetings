@@ -31,7 +31,7 @@ const formSchema = z.object({
   }),
   affiliation: z.string().min(1, "This field is required."),
   phone: z.string().optional(),
-  type: z.enum(["1", "2"], {
+  type: z.enum(["1", "2", "3"], {
     message: "You need to select a type.",
   }),
   dietaryRequirements: z
