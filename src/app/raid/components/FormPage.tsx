@@ -139,6 +139,8 @@ export function FormPage() {
       price = nowAEST < deadlineAEST ? 1450 : 1550;
     } else if (type === "2") {
       price = nowAEST < deadlineAEST ? 1350 : 1450;
+    } else if (type === "3") {
+      price = nowAEST < deadlineAEST ? 850 : 950;
     }
     return price;
   }
@@ -158,6 +160,10 @@ export function FormPage() {
       return nowAEST < deadlineAEST
         ? process.env.NEXT_PUBLIC_STRIPE_POST_PAYMENT_LINK1
         : process.env.NEXT_PUBLIC_STRIPE_POST_PAYMENT_LINK2;
+    } else if (type === "3") {
+      return nowAEST < deadlineAEST
+        ? process.env.NEXT_PUBLIC_STRIPE_STUDENT_PAYMENT_LINK1
+        : process.env.NEXT_PUBLIC_STRIPE_STUDENT_PAYMENT_LINK2;
     }
     return "";
   }
@@ -195,9 +201,13 @@ export function FormPage() {
         <Card className="bg-white shadow-lg border-slate-200">
           <CardHeader className="pb-2">
             <CardTitle className="text-2xl font-bold text-slate-800 text-center">
-              The 28th International Symposium on Research in Attacks,
-              Intrusions and Defenses (RAID 2025) (19 OCT - 22 OCT 2025, Gold
-              Coast, Australia)
+              <div className="flex flex-col items-center">
+                <span>
+                  The 28th International Symposium on Research in
+                  Attacks,Intrusions and Defenses (RAID 2025)
+                </span>
+                <span>19 OCT - 22 OCT 2025, Gold Coast, Australia</span>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -304,7 +314,7 @@ export function FormPage() {
                         <FormLabel>Phone (optional)</FormLabel>
                         <FormControl className="w-full">
                           <PhoneInput
-                            placeholder="Placeholder"
+                            placeholder=""
                             {...field}
                             defaultCountry="AU"
                           />
@@ -326,9 +336,9 @@ export function FormPage() {
                         </FormLabel>
                         {/* 副标题 */}
                         <div className="text-sm text-muted-foreground mb-2">
-                          (Full conference attendance, Reception, Gala Dinner
-                          and Sea World Theme Park Day Pass at conference
-                          special rate for social event are included)
+                          Registration includes access to the full conference,
+                          welcome reception, gala dinner, and a day pass to Sea
+                          World for the social event.
                         </div>
                         <FormControl>
                           <RadioGroup
@@ -349,6 +359,14 @@ export function FormPage() {
                               </FormControl>
                               <FormLabel className="font-normal">
                                 Poster Author and Non Author Registration
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="3" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Student Registraion
                               </FormLabel>
                             </FormItem>
                           </RadioGroup>
@@ -441,13 +459,18 @@ export function FormPage() {
                       : "--"}
                   </div>
                   <div className="text-slate-700">
-                    Additional tickets for Cocktail Reception, Gala Dinner and
-                    Sea World Theme Park Day Pass at conference special rate can
-                    be purchased during check out (Please click view all to see
-                    all options at once)
+                    Additional tickets for the Cocktail Reception, Gala Dinner,
+                    and Sea World Theme Park Day Pass can be purchased at the
+                    conference special rate on the next page. (Please click
+                    'View All' on the next page to see all available add-ons.
+                    Quantities can be adjusted after items are added to your
+                    order.)
                     <br />
-                    Please contactraid25.general.chairs@gmail.com for conference
-                    inquiries.
+                    For conference inquiries, please contact{" "}
+                    <a style={{ color: "blue" }}>
+                      raid25.general.chairs@gmail.com
+                    </a>
+                    .
                   </div>
                 </div>
                 <Button
