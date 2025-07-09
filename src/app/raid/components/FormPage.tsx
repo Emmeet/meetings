@@ -20,34 +20,65 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PhoneInput } from "@/components/ui/phone-iput";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CheckCircle } from "lucide-react";
 
 // Form validation schema
-const formSchema = z.object({
-  firstName: z.string().min(1, "This field is required."),
-  lastName: z.string().min(1, "This field is required."),
-  middleName: z.string().optional(),
-  email: z.string().email({
-    message: "Please enter a valid email address",
-  }),
-  affiliation: z.string().min(1, "This field is required."),
-  phone: z.string().optional(),
-  type: z.enum(["1", "2", "3"], {
-    message: "You need to select a type.",
-  }),
-  dietaryRequirements: z
-    .array(z.string())
-    .refine((value) => value.some((item) => item), {
-      message: "You have to select at least one item.",
+const formSchema = z
+  .object({
+    title: z.enum(["Prof", "Associate Prof", "Dr", "Mr", "Ms", "other"], {
+      message: "Please select a title.",
     }),
-  paperNumber: z.string().optional(),
-  otherExplain: z.string().optional(),
-});
+    firstName: z.string().min(1, "This field is required."),
+    lastName: z.string().min(1, "This field is required."),
+    middleName: z.string().optional(),
+    email: z.string().email({
+      message: "Please enter a valid email address",
+    }),
+    affiliation: z.string().min(1, "This field is required."),
+    phone: z.string().optional(),
+    type: z.enum(["1", "2", "3"], {
+      message: "You need to select a type.",
+    }),
+    dietaryRequirements: z
+      .array(z.string())
+      .refine((value) => value.some((item) => item), {
+        message: "You have to select at least one item.",
+      }),
+    paperNumber: z.string().optional(), // 先设为optional，后面用refine处理
+    otherExplain: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "1" || data.type === "3") {
+        return data.paperNumber && data.paperNumber.trim() !== "";
+      }
+      return true;
+    },
+    {
+      message: "Field is required.",
+      path: ["paperNumber"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.dietaryRequirements.includes("5")) {
+        return data.otherExplain && data.otherExplain.trim() !== "";
+      }
+      return true;
+    },
+    {
+      message: "Please specify your dietary requirement.",
+      path: ["otherExplain"],
+    }
+  );
 export function FormPage() {
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      title: undefined,
       firstName: "",
       middleName: "",
       lastName: "",
@@ -83,6 +114,7 @@ export function FormPage() {
     }
 
     const dataToSend = {
+      title: values.title,
       first_name: values.firstName,
       middle_name: values?.middleName || "",
       last_name: values.lastName,
@@ -113,9 +145,12 @@ export function FormPage() {
       const result = await response.json();
       const customerId = result.id;
 
-      window.location.href = `${
-        getPaymentLink(values.type) as string
-      }?client_reference_id=${customerId}&prefilled_email=${values.email}`;
+      setIsSubmitted(true);
+      window.open(
+        `${
+          getPaymentLink(values.type) as string
+        }?client_reference_id=${customerId}&prefilled_email=${values.email}`
+      );
     } catch (error) {
       console.error("An error occurred:", error);
       // You might want to show an error message to the user here
@@ -198,293 +233,409 @@ export function FormPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
-        <Card className="bg-white shadow-lg border-slate-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-bold text-slate-800 text-center">
-              <div className="flex flex-col items-center">
-                <span>
-                  The 28th International Symposium on Research in
-                  Attacks,Intrusions and Defenses (RAID 2025)
-                </span>
-                <span>19 OCT - 22 OCT 2025, Gold Coast, Australia</span>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="First name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+        {isSubmitted ? (
+          <SuccessMessage />
+        ) : (
+          <Card className="bg-white shadow-lg border-slate-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-2xl font-bold text-slate-800 text-center">
+                <div className="flex flex-col items-center">
+                  <span>
+                    The 28th International Symposium on Research in Attacks,
+                    Intrusions and Defenses (RAID 2025)
+                  </span>
+                  <span>19 OCT - 22 OCT 2025, Gold Coast, Australia</span>
                 </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="middleName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            placeholder="Middle name (optional)"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Last name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="affiliation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Affiliation (Organisation/University/Company)
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your affiliation"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="your.email@example.com"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    rules={{
-                      validate: (value) =>
-                        isValidPhoneNumber(value || "", "AU"),
-                    }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone (optional)</FormLabel>
-                        <FormControl className="w-full">
-                          <PhoneInput
-                            placeholder=""
-                            {...field}
-                            defaultCountry="AU"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>
-                          Registration Type (Each paper needs at least one
-                          registration from one author)
-                        </FormLabel>
-                        {/* 副标题 */}
-                        <div className="text-sm text-muted-foreground mb-2">
-                          Registration includes access to the full conference,
-                          welcome reception, gala dinner, and a day pass to Sea
-                          World for the social event.
-                        </div>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="1" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Paper Author Registration
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="2" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Poster Author and Non Author Registration
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="3" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Student Registraion
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid md:grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="dietaryRequirements"
-                    render={() => (
-                      <FormItem>
-                        <div className="mb-4">
-                          <FormLabel className="text-base">
-                            Dietary requirements
-                          </FormLabel>
-                        </div>
-                        {items.map((item) => (
-                          <FormField
-                            key={item.id}
-                            control={form.control}
-                            name="dietaryRequirements"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={item.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([
-                                              ...field.value,
-                                              item.id,
-                                            ])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== item.id
-                                              )
-                                            );
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">
-                                    {item.label}
-                                  </FormLabel>
-                                </FormItem>
-                              );
-                            }}
-                          />
-                        ))}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                {dietaryRequirements.includes("5") && (
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <div className="grid md:grid-cols-1 gap-4">
                     <FormField
                       control={form.control}
-                      name="otherExplain"
+                      name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Other</FormLabel>
+                          <FormLabel>Title</FormLabel>
                           <FormControl>
-                            <Input type="text" {...field} />
+                            <select
+                              {...field}
+                              className="block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              value={field.value || ""}
+                            >
+                              <option value="" disabled>
+                                Select your title
+                              </option>
+                              <option value="Prof">Prof</option>
+                              <option value="Associate Prof">
+                                Associate Prof
+                              </option>
+                              <option value="Dr">Dr</option>
+                              <option value="Mr">Mr</option>
+                              <option value="Ms">Ms</option>
+                              <option value="other">other</option>
+                            </select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-                )}
-                <div className="text-center space-y-2 mb-6">
-                  <div className="text-slate-700">
-                    Raid 2025 Registration Fee (Including Tax and Transaction
-                    Fee)
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="First name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div className="text-2xl font-bold">
-                    {type
-                      ? `AU$${getCurrentPrice(type).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`
-                      : "--"}
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="middleName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Middle name (optional)"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div className="text-slate-700">
-                    Additional tickets for the Cocktail Reception, Gala Dinner,
-                    and Sea World Theme Park Day Pass can be purchased at the
-                    conference special rate on the next page. (Please click
-                    'View All' on the next page to see all available add-ons.
-                    Quantities can be adjusted after items are added to your
-                    order.)
-                    <br />
-                    For conference inquiries, please contact{" "}
-                    <a style={{ color: "blue" }}>
-                      raid25.general.chairs@gmail.com
-                    </a>
-                    .
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input placeholder="Last name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer"
-                  disabled={loading}
-                >
-                  {loading ? "Submitting..." : "Next"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="affiliation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Affiliation (Organisation/University/Company)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your affiliation"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="your.email@example.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      rules={{
+                        validate: (value) =>
+                          isValidPhoneNumber(value || "", "AU"),
+                      }}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone (optional)</FormLabel>
+                          <FormControl className="w-full">
+                            <PhoneInput
+                              placeholder=""
+                              {...field}
+                              defaultCountry="AU"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>
+                            Registration Type (Each paper needs at least one
+                            registration from one author)
+                          </FormLabel>
+                          {/* 副标题 */}
+                          <div className="text-sm text-muted-foreground mb-2">
+                            Registration includes access to the full conference,
+                            welcome reception, gala dinner, and a day pass to
+                            Sea World for the social event.
+                          </div>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="1" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Paper Author Registration
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="2" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Poster Author and Non Author Registration
+                                </FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="3" />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  Student Registraion
+                                </FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {type === "1" && (
+                    <div className="grid md:grid-cols-1 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="paperNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Paper ID & Title</FormLabel>
+                            <FormControl>
+                              <Input type="text" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                  {type === "2" && (
+                    <div className="grid md:grid-cols-1 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="paperNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Poster ID & Title (to be entered by the poster
+                              author)
+                            </FormLabel>
+                            <FormControl>
+                              <Input type="text" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                  {type === "3" && (
+                    <div className="grid md:grid-cols-1 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="paperNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Student ID</FormLabel>
+                            <FormControl>
+                              <Input type="text" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="dietaryRequirements"
+                      render={() => (
+                        <FormItem>
+                          <div className="mb-4">
+                            <FormLabel className="text-base">
+                              Dietary requirements
+                            </FormLabel>
+                          </div>
+                          {items.map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name="dietaryRequirements"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([
+                                                ...field.value,
+                                                item.id,
+                                              ])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                  (value) => value !== item.id
+                                                )
+                                              );
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                      {item.label}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {dietaryRequirements.includes("5") && (
+                    <div className="grid md:grid-cols-1 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="otherExplain"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Please specify</FormLabel>
+                            <FormControl>
+                              <Input type="text" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                  <div className="text-center space-y-2 mb-6">
+                    <div className="text-slate-700">
+                      Raid 2025 Registration Fee (Including Tax and Transaction
+                      Fee)
+                    </div>
+                    <div className="text-2xl font-bold">
+                      {type
+                        ? `AU$${getCurrentPrice(type).toLocaleString(
+                            undefined,
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }
+                          )}`
+                        : "--"}
+                    </div>
+                    <div className="text-slate-700">
+                      Additional tickets for the Cocktail Reception, Gala
+                      Dinner, and Sea World Theme Park Day Pass can be purchased
+                      at the conference special rate on the next page. (Please
+                      click 'View All' on the next page to see all available
+                      add-ons. Quantities can be adjusted after items are added
+                      to your order.)
+                      <br />
+                      For conference inquiries, please contact{" "}
+                      <a style={{ color: "blue" }}>
+                        raid25.general.chairs@gmail.com
+                      </a>
+                      .
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full cursor-pointer"
+                    disabled={loading}
+                  >
+                    {loading ? "Submitting..." : "Next"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
+  );
+}
+
+function SuccessMessage() {
+  return (
+    <Card className="bg-white shadow-lg border-slate-200 text-center p-6">
+      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <CheckCircle className="h-8 w-8 text-green-600" />
+      </div>
+      <h2 className="text-2xl font-bold text-slate-900 mb-4">
+        Submission Successful
+      </h2>
+      <p className="text-slate-600 mb-8">
+        Thank you for your submission. Our team will contact you shortly to
+        provide professional security service consultation.
+      </p>
+      <Button
+        onClick={() => window.location.reload()}
+        variant="outline"
+        className="mx-auto"
+      >
+        Return to Form
+      </Button>
+    </Card>
   );
 }
