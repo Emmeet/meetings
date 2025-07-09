@@ -628,17 +628,7 @@ function SuccessMessage() {
       <h2 className="text-2xl font-bold text-slate-900 mb-4">
         Submission Successful
       </h2>
-      <p className="text-slate-600 mb-8">
-        Thank you for your submission. Our team will contact you shortly to
-        provide professional security service consultation.
-      </p>
-      {/* <Button
-        onClick={() => window.location.reload()}
-        variant="outline"
-        className="mx-auto"
-      >
-        Return to Form
-      </Button> */}
+      <p className="text-slate-600 mb-8">Thank you for your submission.</p>
     </Card>
   );
 }
