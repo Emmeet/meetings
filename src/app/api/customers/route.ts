@@ -5,6 +5,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
+      title,
+      otherTitle,
       first_name,
       middle_name,
       last_name,
@@ -21,6 +23,8 @@ export async function POST(request: Request) {
 
     const newCustomer = await prisma.customer_info.create({
       data: {
+        title,
+        other_title: otherTitle,
         first_name,
         middle_name,
         last_name,
