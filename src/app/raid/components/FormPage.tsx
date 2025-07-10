@@ -23,7 +23,7 @@ import { CheckCircle } from "lucide-react";
 // Form validation schema
 const formSchema = z
   .object({
-    title: z.enum(["Prof", "Associate Prof", "Dr", "Mr", "Ms", "other"], {
+    title: z.enum(["Prof", "A/Prof", "Dr", "Mr", "Ms", "other"], {
       message: "Please select a title.",
     }),
     firstName: z.string().min(1, "This field is required."),
@@ -187,11 +187,11 @@ export function FormPage() {
     const deadlineAEST = new Date(Date.UTC(2025, 7, 14, 14, 0, 0)); // 8月是7，14号14点UTC=15号0点AEST
     let price = 0;
     if (type === "1") {
-      price = nowAEST < deadlineAEST ? 1450 : 1550;
+      price = nowAEST < deadlineAEST ? 1450 : 1600;
     } else if (type === "2" || type === "4") {
-      price = nowAEST < deadlineAEST ? 1350 : 1450;
+      price = nowAEST < deadlineAEST ? 1450 : 1600;
     } else if (type === "3") {
-      price = nowAEST < deadlineAEST ? 850 : 950;
+      price = nowAEST < deadlineAEST ? 800 : 950;
     }
     return price;
   }
@@ -291,9 +291,7 @@ export function FormPage() {
                                 Select your title
                               </option>
                               <option value="Prof">Prof</option>
-                              <option value="Associate Prof">
-                                Associate Prof
-                              </option>
+                              <option value="A/Prof">A/Prof</option>
                               <option value="Dr">Dr</option>
                               <option value="Mr">Mr</option>
                               <option value="Ms">Ms</option>
@@ -446,8 +444,8 @@ export function FormPage() {
                           {/* 副标题 */}
                           <div className="text-sm text-muted-foreground mb-2">
                             Registration includes access to the full conference,
-                            welcome reception, gala dinner, and a day pass to
-                            Sea World for the social event.
+                            catering, welcome reception, gala dinner, and a day
+                            pass to Sea World for the social event.
                           </div>
                           <FormControl>
                             <RadioGroup
@@ -467,7 +465,7 @@ export function FormPage() {
                                   <RadioGroupItem value="2" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  Poster Author and Non Author Registration
+                                  Poster Author Registration
                                 </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
@@ -475,7 +473,7 @@ export function FormPage() {
                                   <RadioGroupItem value="4" />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  Non Author Registration
+                                  Regular Registration
                                 </FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
