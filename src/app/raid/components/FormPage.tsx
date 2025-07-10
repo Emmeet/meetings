@@ -186,9 +186,7 @@ export function FormPage() {
     // 截止时间：2025-08-15 00:00:00 AEST
     const deadlineAEST = new Date(Date.UTC(2025, 7, 14, 14, 0, 0)); // 8月是7，14号14点UTC=15号0点AEST
     let price = 0;
-    if (type === "1") {
-      price = nowAEST < deadlineAEST ? 1450 : 1600;
-    } else if (type === "2" || type === "4") {
+    if (type === "1" || type === "2" || type === "4") {
       price = nowAEST < deadlineAEST ? 1450 : 1600;
     } else if (type === "3") {
       price = nowAEST < deadlineAEST ? 800 : 950;
