@@ -436,8 +436,8 @@ export function FormPage() {
                       render={({ field }) => (
                         <FormItem className="space-y-3">
                           <FormLabel>
-                            Registration Type (Each paper needs at least one
-                            registration from one author)
+                            Registration Type (Each paper/poster needs at least
+                            one author registration)
                           </FormLabel>
                           {/* 副标题 */}
                           <div className="text-sm text-muted-foreground mb-2">
