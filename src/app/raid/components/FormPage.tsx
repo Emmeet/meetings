@@ -184,7 +184,7 @@ export function FormPage() {
       now.getTime() + 10 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000
     );
     // 截止时间：2025-08-15 00:00:00 AEST
-    const deadlineAEST = new Date(Date.UTC(2025, 7, 14, 18, 0, 0)); // 8月是7，14号18点UTC=15号凌晨4点AEST
+    const deadlineAEST = new Date(Date.UTC(2025, 7, 22, 18, 0, 0)); // 8月是7，14号18点UTC=15号凌晨4点AEST
     let price = 0;
     if (type === "1" || type === "2" || type === "4") {
       price = nowAEST < deadlineAEST ? 1450 : 1600;
@@ -200,7 +200,7 @@ export function FormPage() {
     const nowAEST = new Date(
       now.getTime() + 10 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000
     );
-    const deadlineAEST = new Date(Date.UTC(2025, 7, 14, 18, 0, 0)); // 8月是7，14号18点UTC=15号凌晨4点AEST
+    const deadlineAEST = new Date(Date.UTC(2025, 7, 22, 18, 0, 0)); // 8月是7，14号18点UTC=15号凌晨4点AEST
     if (type === "1") {
       return nowAEST < deadlineAEST
         ? process.env.NEXT_PUBLIC_STRIPE_PAPER_PAYMENT_LINK1
