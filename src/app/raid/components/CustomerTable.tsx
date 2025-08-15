@@ -130,15 +130,13 @@ const CustomerTable = () => {
       accessorKey: "paper_number",
       header: "",
       enableSorting: false,
-      size: 130,
-      minSize: 130,
-      maxSize: 250,
+      size: 250,
       cell: ({ row }) => {
         const paperNumber = row.getValue("paper_number") || "-";
         const paper = paperNumber as string;
         return (
           <div className="font-medium" title={paper}>
-            {paper.length > 30 ? paper.substring(0, 30) : paper}
+            {paper.length > 15 ? paper.substring(0, 15) + "..." : paper}
           </div>
         );
       },
