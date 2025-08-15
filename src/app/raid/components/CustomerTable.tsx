@@ -132,27 +132,16 @@ const CustomerTable = () => {
       enableSorting: false,
       size: 130,
       minSize: 130,
-      maxSize: 150,
+      maxSize: 250,
       cell: ({ row }) => {
         const paperNumber = row.getValue("paper_number") || "-";
         const paper = paperNumber as string;
         return (
           <div className="font-medium" title={paper}>
-            {paper.length > 20 ? paper.substring(0, 20) : paper}
+            {paper.length > 30 ? paper.substring(0, 30) : paper}
           </div>
         );
       },
-    },
-    {
-      accessorKey: "phone",
-      header: "Phone",
-      enableSorting: false,
-      size: 130,
-      minSize: 130,
-      maxSize: 150,
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("phone") || "-"}</div>
-      ),
     },
     {
       accessorKey: "affiliation",
