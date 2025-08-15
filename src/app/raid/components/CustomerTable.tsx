@@ -133,9 +133,15 @@ const CustomerTable = () => {
       size: 130,
       minSize: 130,
       maxSize: 150,
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("paper_number") || "-"}</div>
-      ),
+      cell: ({ row }) => {
+        const paperNumber = row.getValue("paper_number") || "-";
+        const paper = paperNumber as string;
+        return (
+          <div className="font-medium" title={paper}>
+            {paper.length > 20 ? paper.substring(0, 20) : paper}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "phone",
