@@ -110,6 +110,34 @@ const CustomerTable = () => {
       ),
     },
     {
+      accessorKey: "type",
+      header: "Registration Type",
+      enableSorting: false,
+      size: 200,
+      cell: ({ row }) => {
+        let type = "Paper Author Registration";
+        if (row.getValue("type") == 2) {
+          type = "Poster Author Registration";
+        } else if (row.getValue("type") == 3) {
+          type = "Student Registraion";
+        } else if (row.getValue("type") == 4) {
+          type = "Regular Registration";
+        }
+        return <div className="truncate">{type}</div>;
+      },
+    },
+    {
+      accessorKey: "paper_number",
+      header: "",
+      enableSorting: false,
+      size: 130,
+      minSize: 130,
+      maxSize: 150,
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("paper_number") || "-"}</div>
+      ),
+    },
+    {
       accessorKey: "phone",
       header: "Phone",
       enableSorting: false,
