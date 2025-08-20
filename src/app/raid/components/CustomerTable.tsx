@@ -23,8 +23,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, ChevronsUpDown, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Search,
+  Download,
+} from "lucide-react";
 import { Customer, CustomerResponse } from "@/types/customer";
+import * as XLSX from "xlsx";
 
 const CustomerTable = () => {
   const [data, setData] = useState<Customer[]>([]);
@@ -38,6 +45,7 @@ const CustomerTable = () => {
   });
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   // 定义列
   const columns: ColumnDef<Customer>[] = [
@@ -218,6 +226,46 @@ const CustomerTable = () => {
     }
   };
 
+  // 导出Excel函数
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch("/api/customers/export");
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        // 创建工作簿
+        const workbook = XLSX.utils.book_new();
+
+        // 将数据转换为工作表
+        const worksheet = XLSX.utils.json_to_sheet(result.data);
+
+        // 添加工作表到工作簿
+        XLSX.utils.book_append_sheet(
+          workbook,
+          worksheet,
+          "Customer Statistics"
+        );
+
+        // 生成文件名（包含当前日期）
+        const now = new Date();
+        const dateStr = now.toISOString().split("T")[0]; // YYYY-MM-DD格式
+        const filename = `customer_statistics_${dateStr}.xlsx`;
+
+        // 下载文件
+        XLSX.writeFile(workbook, filename);
+      } else {
+        console.error("Export failed:", result.error);
+        alert("Export failed, please try again later");
+      }
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Export failed, please try again later");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // 监听状态变化
   useEffect(() => {
     fetchData();
@@ -262,6 +310,14 @@ const CustomerTable = () => {
               />
             </div>
           </div>
+          <Button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex items-center space-x-2"
+          >
+            <Download className="h-4 w-4" />
+            <span>{isExporting ? "Exporting..." : "Export Excel"}</span>
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>

@@ -1,5 +1,6 @@
 export interface Customer {
   id: number;
+  title: string | null;
   first_name: string | null;
   middle_name: string | null;
   last_name: string | null;
