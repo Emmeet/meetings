@@ -48,3 +48,25 @@ model payment_log {
 
   @@map("payment_log")
 }
+
+model asiacrypt_visa_request {
+  id                  Int      @id @default(autoincrement()) @db.UnsignedInt
+  title               String?  @db.VarChar(255)
+  other_title         String?  @db.VarChar(255)
+  first_name          String?  @db.VarChar(255)
+  middle_name         String?  @db.VarChar(255)
+  last_name           String?  @db.VarChar(255)
+  date_of_birth       DateTime?    @db.Date
+  nationality         String?  @db.VarChar(255)
+  institute           String?  @db.VarChar(255)
+  paper_title         String?  @db.VarChar(255)
+  academic_profile    String?  @db.VarChar(255)
+  conference_interests String? @db.VarChar(1024)
+  iacr_experience     String?  @db.VarChar(1024)
+  file_name           String?  @db.VarChar(255)
+  file_key            String?  @db.VarChar(255)
+  type                Int?
+  create_date         DateTime? @default(now()) @db.DateTime(0)
+
+  @@map("asiacrypt_visa_request")
+}

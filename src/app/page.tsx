@@ -1,9 +1,9 @@
-import { FormPage } from "./raid/components/FormPage";
+import { AsiaCryptForm } from "./asiacrypt/component/AsiaCryptForm";
 
 export default function page() {
   return (
     <>
-      <FormPage />
+      <AsiaCryptForm />
     </>
   );
 }
