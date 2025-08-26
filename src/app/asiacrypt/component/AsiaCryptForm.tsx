@@ -30,7 +30,7 @@ import { format } from "date-fns";
 const formSchema = z
   .object({
     title: z.enum(
-      ["Professor", "A/Professor", "Dr", "Mr", "Ms", "Miss", "其他"],
+      ["Professor", "A/Professor", "Dr", "Mr", "Ms", "Miss", "other"],
       {
         message: "Please select a title.",
       }
@@ -51,7 +51,7 @@ const formSchema = z
   })
   .refine(
     (data) => {
-      if (data.title === "其他") {
+      if (data.title === "other") {
         return data.otherTitle && data.otherTitle.trim() !== "";
       }
       return true;
@@ -136,7 +136,8 @@ export function AsiaCryptForm() {
                 </div>
               </CardTitle>
               <div className="text-sm text-slate-600 text-center mt-1">
-                提交此表单时，除非自己提供，否则它不会自动收集姓名和电子邮件地址等详细信息。
+                This form does not automatically collect details such as your
+                name or email address unless you provide them yourself.
               </div>
             </CardHeader>
             <CardContent className="p-6">
@@ -193,8 +194,8 @@ export function AsiaCryptForm() {
                               <label htmlFor="miss">Miss</label>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="其他" id="other-title" />
-                              <label htmlFor="other-title">其他</label>
+                              <RadioGroupItem value="Other" id="other-title" />
+                              <label htmlFor="other-title">other</label>
                             </div>
                           </RadioGroup>
                         </FormControl>
@@ -204,14 +205,17 @@ export function AsiaCryptForm() {
                   />
 
                   {/* Other Title - conditional field */}
-                  {title === "其他" && (
+                  {title === "other" && (
                     <FormField
                       control={form.control}
                       name="otherTitle"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input placeholder="请输入您的称谓" {...field} />
+                            <Input
+                              placeholder="Please enter your title"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -229,7 +233,10 @@ export function AsiaCryptForm() {
                           2. First Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的名字" {...field} />
+                          <Input
+                            placeholder="Enter your first name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -244,7 +251,10 @@ export function AsiaCryptForm() {
                       <FormItem>
                         <FormLabel>3. Middle Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的名字" {...field} />
+                          <Input
+                            placeholder="Enter your middle name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -261,7 +271,10 @@ export function AsiaCryptForm() {
                           4. Last Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的姓氏" {...field} />
+                          <Input
+                            placeholder="Enter your last name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -289,16 +302,15 @@ export function AsiaCryptForm() {
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "yyyy/M/d")
+                                  format(field.value, "dd/MM/yyyy")
                                 ) : (
-                                  <span>2025/8/26</span>
+                                  <span>26/08/2025</span>
                                 )}
                                 <Calendar className="ml-auto h-4 w-4 opacity-50" />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
-                            {/* 这里需要日期选择器组件，简化实现 */}
                             <div className="p-4">
                               <Input
                                 type="date"
@@ -332,7 +344,10 @@ export function AsiaCryptForm() {
                           7. Nationality <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的国籍" {...field} />
+                          <Input
+                            placeholder="Enter your nationality"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -349,7 +364,10 @@ export function AsiaCryptForm() {
                           8. Institute <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的机构" {...field} />
+                          <Input
+                            placeholder="Enter your institution"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -367,7 +385,10 @@ export function AsiaCryptForm() {
                           applicable
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的答案" {...field} />
+                          <Input
+                            placeholder="Enter your paper title"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -385,7 +406,10 @@ export function AsiaCryptForm() {
                           list of publications, if applicable
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的答案" {...field} />
+                          <Input
+                            placeholder="Enter your academic profile URL"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -403,7 +427,10 @@ export function AsiaCryptForm() {
                           conference <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Textarea placeholder="输入您的答案" {...field} />
+                          <Textarea
+                            placeholder="Enter your statement"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -423,7 +450,10 @@ export function AsiaCryptForm() {
                           <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Textarea placeholder="输入您的答案" {...field} />
+                          <Textarea
+                            placeholder="Enter your IACR conference experience"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -435,7 +465,7 @@ export function AsiaCryptForm() {
                     className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700"
                     disabled={loading}
                   >
-                    {loading ? "提交中..." : "提交"}
+                    {loading ? "Submitting..." : "Submit"}
                   </Button>
                 </form>
               </Form>
@@ -453,10 +483,9 @@ function SuccessMessage() {
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
         <CheckCircle className="h-8 w-8 text-green-600" />
       </div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-4">提交成功</h2>
-      <p className="text-slate-600 mb-8">
-        感谢您的提交，我们会尽快处理您的申请。
-      </p>
+      <h2 className="text-2xl font-bold text-slate-900 mb-4">
+        Submission Successful
+      </h2>
     </Card>
   );
 }

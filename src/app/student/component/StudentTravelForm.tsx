@@ -105,7 +105,7 @@ export function StudentTravelForm() {
       setIsSubmitted(true);
     } catch (error) {
       console.error("Failed to submit form:", error);
-      alert("提交失败，请稍后重试");
+      alert("Submission failed, please try again later.");
     } finally {
       setLoading(false);
     }
@@ -180,7 +180,10 @@ export function StudentTravelForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input placeholder="请输入您的称谓" {...field} />
+                            <Input
+                              placeholder="Please enter your title"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -198,7 +201,10 @@ export function StudentTravelForm() {
                           2. First Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的名字" {...field} />
+                          <Input
+                            placeholder="Enter your first name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -213,7 +219,10 @@ export function StudentTravelForm() {
                       <FormItem>
                         <FormLabel>3. Middle Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的名字" {...field} />
+                          <Input
+                            placeholder="Enter your middle name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -230,7 +239,10 @@ export function StudentTravelForm() {
                           4. Last Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="输入您的姓氏" {...field} />
+                          <Input
+                            placeholder="Enter your last name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -304,7 +316,7 @@ export function StudentTravelForm() {
                     className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700"
                     disabled={loading}
                   >
-                    {loading ? "提交中..." : "提交"}
+                    {loading ? "Submitting..." : "Submit"}
                   </Button>
                 </form>
               </Form>
@@ -322,10 +334,9 @@ function SuccessMessage() {
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
         <CheckCircle className="h-8 w-8 text-green-600" />
       </div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-4">提交成功</h2>
-      <p className="text-slate-600 mb-8">
-        感谢您的提交，我们会尽快处理您的申请。
-      </p>
+      <h2 className="text-2xl font-bold text-slate-900 mb-4">
+        Submission Successful
+      </h2>
     </Card>
   );
 }
