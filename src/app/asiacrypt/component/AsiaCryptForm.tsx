@@ -39,6 +39,9 @@ const formSchema = z
     firstName: z.string().min(1, "This field is required."),
     middleName: z.string().optional(),
     lastName: z.string().min(1, "This field is required."),
+    email: z.string().email({
+      message: "Please enter a valid email address",
+    }),
     dateOfBirth: z.date({
       required_error: "Date of birth is required.",
     }),
@@ -74,6 +77,7 @@ export function AsiaCryptForm() {
       firstName: "",
       middleName: "",
       lastName: "",
+      email: "",
       dateOfBirth: undefined,
       nationality: "",
       institute: "",
@@ -135,10 +139,6 @@ export function AsiaCryptForm() {
                   </span>
                 </div>
               </CardTitle>
-              <div className="text-sm text-slate-600 text-center mt-1">
-                This form does not automatically collect details such as your
-                name or email address unless you provide them yourself.
-              </div>
             </CardHeader>
             <CardContent className="p-6">
               <Form {...form}>
@@ -153,7 +153,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          1. Title <span className="text-red-500">*</span>
+                          Title <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <RadioGroup
@@ -230,7 +230,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          2. First Name <span className="text-red-500">*</span>
+                          First Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -249,7 +249,7 @@ export function AsiaCryptForm() {
                     name="middleName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>3. Middle Name</FormLabel>
+                        <FormLabel>Middle Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Enter your middle name"
@@ -268,7 +268,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          4. Last Name <span className="text-red-500">*</span>
+                          Last Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -280,7 +280,27 @@ export function AsiaCryptForm() {
                       </FormItem>
                     )}
                   />
-
+                  <div className="grid md:grid-cols-1 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Contact Email<span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="your.email@example.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   {/* Date of Birth */}
                   <FormField
                     control={form.control}
@@ -288,8 +308,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          6. Date of birth{" "}
-                          <span className="text-red-500">*</span>
+                          Date of birth <span className="text-red-500">*</span>
                         </FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -341,7 +360,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          7. Nationality <span className="text-red-500">*</span>
+                          Nationality <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -361,7 +380,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          8. Institute <span className="text-red-500">*</span>
+                          Institute <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -381,7 +400,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          9. The title of your paper at Asiacrypt 2025, if
+                          The title of your paper at Asiacrypt 2025, if
                           applicable
                         </FormLabel>
                         <FormControl>
@@ -402,8 +421,8 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          10. Provide a link to your academic profile with a
-                          list of publications, if applicable
+                          Provide a link to your academic profile with a list of
+                          publications, if applicable
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -423,7 +442,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          11. A brief statement explaining your interests in the
+                          A brief statement explaining your interests in the
                           conference <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
@@ -444,7 +463,7 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          12. A list of any recent IACR conferences you have
+                          A list of any recent IACR conferences you have
                           attended and/or a reference in the crypto community
                           who has attended past IACR conferences{" "}
                           <span className="text-red-500">*</span>
