@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RAID 2025",
-  description:
-    "The 28th International Symposium on Research in Attacks, ntrusions and Defenses (RAID 2025)",
+  title: "Asiacrypt 2025 Request for Invitation Letter ",
+  description: "Asiacrypt 2025 Request for Invitation Letter ",
 };
 
 export default function RootLayout({

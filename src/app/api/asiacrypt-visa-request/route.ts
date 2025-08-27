@@ -4,20 +4,23 @@ import * as z from "zod";
 
 const formSchema = z.object({
   title: z.string(),
+  type: z.number(),
   otherTitle: z.string().optional(),
   firstName: z.string(),
   middleName: z.string().optional(),
   lastName: z.string(),
-  email: z.string(),
+  email: z.string().optional(),
   dateOfBirth: z.string().optional(),
   nationality: z.string().optional(),
   institute: z.string().optional(),
+  paperNumber: z.string().optional(),
   paperTitle: z.string().optional(),
   academicProfile: z.string().optional(),
   conferenceInterests: z.string().optional(),
   iacrExperience: z.string().optional(),
   fileKey: z.string().optional(),
   fileName: z.string().optional(),
+  hasIacr: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,18 +37,21 @@ export async function POST(req: NextRequest) {
     const result = await prisma.asiacrypt_visa_request.create({
       data: {
         title: data.title,
+        type: data.type,
         other_title: data.otherTitle || null,
         first_name: data.firstName,
         middle_name: data.middleName || null,
         last_name: data.lastName,
-        email: data.email,
+        email: data.email || null,
         date_of_birth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
         nationality: data.nationality,
         institute: data.institute,
+        paper_number: data.paperNumber || null,
         paper_title: data.paperTitle || null,
         academic_profile: data.academicProfile || null,
         conference_interests: data.conferenceInterests,
         iacr_experience: data.iacrExperience,
+        has_iacr: data.hasIacr ? Number(data.hasIacr) : undefined,
         file_key: data.fileKey || null,
         file_name: data.fileName || null,
       },

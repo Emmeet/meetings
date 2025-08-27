@@ -30,7 +30,7 @@ import { format } from "date-fns";
 const formSchema = z
   .object({
     title: z.enum(
-      ["Professor", "A/Professor", "Dr", "Mr", "Ms", "Miss", "other"],
+      ["Professor", "A/Professor", "Dr", "Mr", "Ms", "Miss", "Other"],
       {
         message: "Please select a title.",
       }
@@ -54,7 +54,7 @@ const formSchema = z
   })
   .refine(
     (data) => {
-      if (data.title === "other") {
+      if (data.title === "Other") {
         return data.otherTitle && data.otherTitle.trim() !== "";
       }
       return true;
@@ -195,7 +195,7 @@ export function AsiaCryptForm() {
                             </div>
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="Other" id="other-title" />
-                              <label htmlFor="other-title">other</label>
+                              <label htmlFor="other-title">Other</label>
                             </div>
                           </RadioGroup>
                         </FormControl>
@@ -205,7 +205,7 @@ export function AsiaCryptForm() {
                   />
 
                   {/* Other Title - conditional field */}
-                  {title === "other" && (
+                  {title === "Other" && (
                     <FormField
                       control={form.control}
                       name="otherTitle"
@@ -280,27 +280,25 @@ export function AsiaCryptForm() {
                       </FormItem>
                     )}
                   />
-                  <div className="grid md:grid-cols-1 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Contact Email<span className="text-red-500">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="your.email@example.com"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Contact Email<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="your.email@example.com"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   {/* Date of Birth */}
                   <FormField
                     control={form.control}
@@ -421,8 +419,9 @@ export function AsiaCryptForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Provide a link to your academic profile with a list of
-                          publications, if applicable
+                          Provide a link to your up-to-date Curriculum Vitae
+                          (CV) that includes, if applicable, a list of
+                          publications
                         </FormLabel>
                         <FormControl>
                           <Input

@@ -60,9 +60,11 @@ model asiacrypt_visa_request {
   date_of_birth       DateTime?    @db.Date
   nationality         String?  @db.VarChar(255)
   institute           String?  @db.VarChar(255)
+  paper_number         String?  @db.VarChar(255)
   paper_title         String?  @db.VarChar(255)
   academic_profile    String?  @db.VarChar(255)
   conference_interests String? @db.VarChar(1024)
+  has_iacr            Int?
   iacr_experience     String?  @db.VarChar(1024)
   file_name           String?  @db.VarChar(255)
   file_key            String?  @db.VarChar(255)
