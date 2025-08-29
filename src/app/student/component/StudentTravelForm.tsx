@@ -33,7 +33,7 @@ const formSchema = z
       .refine(
         (files) =>
           files && files.length === 1 && files[0].type === "application/pdf",
-        { message: "请上传PDF文件" }
+        { message: "Please upload a PDF file." }
       ),
   })
   .refine(
@@ -295,17 +295,27 @@ export function StudentTravelForm() {
                           </p>
                         </div>
                         <FormControl>
-                          <Input
-                            type="file"
-                            accept=".pdf"
-                            onChange={(e) => {
-                              const files = e.target.files;
-                              if (files && files.length > 0) {
-                                onChange(files);
-                              }
-                            }}
-                            {...field}
-                          />
+                          <label
+                            htmlFor="student-upload"
+                            className="border-2 border-dashed border-blue-400 rounded-lg p-4 bg-blue-50 flex flex-col items-center mb-2 cursor-pointer"
+                          >
+                            <CheckCircle className="w-8 h-8 text-blue-500 mb-2" />
+                            <span className="font-semibold text-blue-700 mb-2">
+                              Please select a PDF file to upload
+                            </span>
+                            <Input
+                              id="student-upload"
+                              type="file"
+                              accept=".pdf"
+                              onChange={(e) => {
+                                const files = e.target.files;
+                                if (files && files.length > 0) {
+                                  onChange(files);
+                                }
+                              }}
+                              {...field}
+                            />
+                          </label>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -42,7 +42,7 @@ const formSchema = z
       .refine(
         (files) =>
           files && files.length === 1 && files[0].type === "application/pdf",
-        { message: "请上传PDF文件" }
+        { message: "Please upload a PDF file." }
       ),
   })
   .refine(
@@ -135,9 +135,10 @@ export function StudentRegistrationForm() {
             <CardHeader className="pb-2">
               <CardTitle className="text-2xl font-bold text-slate-800 text-center">
                 <div className="flex flex-col items-center">
-                  <span>AsiaCrypt 2025 - Student Travel Stipends</span>
+                  <span>AsiaCrypt 2025</span>
                   <span className="text-lg font-normal text-slate-600 mt-2">
-                    Application for Student Travel Stipends
+                    Online form for student speaker's registration wavier
+                    request
                   </span>
                 </div>
               </CardTitle>
@@ -346,17 +347,27 @@ export function StudentRegistrationForm() {
                           <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="file"
-                            accept=".pdf"
-                            onChange={(e) => {
-                              const files = e.target.files;
-                              if (files && files.length > 0) {
-                                onChange(files);
-                              }
-                            }}
-                            {...field}
-                          />
+                          <label
+                            htmlFor="student-upload"
+                            className="border-2 border-dashed border-blue-400 rounded-lg p-4 bg-blue-50 flex flex-col items-center mb-2 cursor-pointer"
+                          >
+                            <CheckCircle className="w-8 h-8 text-blue-500 mb-2" />
+                            <span className="font-semibold text-blue-700 mb-2">
+                              Please select a PDF file to upload
+                            </span>
+                            <Input
+                              id="student-upload"
+                              type="file"
+                              accept=".pdf"
+                              onChange={(e) => {
+                                const files = e.target.files;
+                                if (files && files.length > 0) {
+                                  onChange(files);
+                                }
+                              }}
+                              {...field}
+                            />
+                          </label>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
