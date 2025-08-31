@@ -28,6 +28,13 @@ const formSchema = z
     firstName: z.string().min(1, "This field is required."),
     middleName: z.string().optional(),
     lastName: z.string().min(1, "This field is required."),
+    email: z.string().email({
+      message: "Please enter a valid email address",
+    }),
+    institute: z.string().min(1, "This field is required."),
+    hasIacr: z.enum(["1", "0"], {
+      message: "Please select.",
+    }),
     attachments: z
       .any()
       .refine(
@@ -61,6 +68,9 @@ export function StudentTravelForm() {
       firstName: "",
       middleName: "",
       lastName: "",
+      email: "",
+      institute: "",
+      hasIacr: undefined,
       attachments: undefined,
     },
   });
@@ -121,7 +131,7 @@ export function StudentTravelForm() {
             <CardHeader className="pb-2">
               <CardTitle className="text-2xl font-bold text-slate-800 text-center">
                 <div className="flex flex-col items-center">
-                  <span>AsiaCrypt 2025 - Student Travel Stipends</span>
+                  <span>AsiaCrypt 2025 - Student Travel Stipend Request</span>
                   <span className="text-lg font-normal text-slate-600 mt-2">
                     Application for Student Travel Stipends
                   </span>
@@ -141,7 +151,7 @@ export function StudentTravelForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          1. Title <span className="text-red-500">*</span>
+                          Title <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <RadioGroup
@@ -198,7 +208,7 @@ export function StudentTravelForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          2. First Name <span className="text-red-500">*</span>
+                          First Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -217,7 +227,7 @@ export function StudentTravelForm() {
                     name="middleName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>3. Middle Name</FormLabel>
+                        <FormLabel>Middle Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Enter your middle name"
@@ -236,7 +246,7 @@ export function StudentTravelForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          4. Last Name <span className="text-red-500">*</span>
+                          Last Name <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -256,7 +266,7 @@ export function StudentTravelForm() {
                     render={({ field: { onChange, value, ...field } }) => (
                       <FormItem>
                         <FormLabel>
-                          5. Upload a single PDF file with{" "}
+                          Upload a single PDF file with{" "}
                           <span className="text-red-500">*</span>
                         </FormLabel>
                         <div className="space-y-2 text-sm text-gray-600">
@@ -316,6 +326,77 @@ export function StudentTravelForm() {
                               {...field}
                             />
                           </label>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Institute */}
+                  <FormField
+                    control={form.control}
+                    name="institute"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Institution/Affiliation Name{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your institution"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Contact Email (ending with the institution/affiliation
+                          domain) <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="your.email@example.com"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Has IACR */}
+                  <FormField
+                    control={form.control}
+                    name="hasIacr"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Are you a student presenting your accepted paper in
+                          the conference? (Yes/No)
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="flex flex-col space-y-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="1" id="yes" />
+                              <label htmlFor="yes">Yes</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="0" id="no" />
+                              <label htmlFor="no">No</label>
+                            </div>
+                          </RadioGroup>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
