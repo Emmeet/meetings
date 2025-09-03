@@ -23,6 +23,62 @@ const formSchema = z.object({
   hasIacr: z.string().optional(),
 });
 
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
+    const search = searchParams.get("search") || "";
+    const sortBy = searchParams.get("sortBy") || "id";
+    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const type = searchParams.get("type");
+
+    const skip = (page - 1) * pageSize;
+
+    let where: any = search
+      ? {
+          OR: [
+            { first_name: { contains: search } },
+            { last_name: { contains: search } },
+            { email: { contains: search } },
+            { institute: { contains: search } },
+          ],
+        }
+      : {};
+
+    if (type) {
+      where.type = parseInt(type, 10);
+    }
+
+    const [data, total] = await Promise.all([
+      prisma.asiacrypt_visa_request.findMany({
+        where,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+        skip,
+        take: pageSize,
+      }),
+      prisma.asiacrypt_visa_request.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      data,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
+  } catch (e) {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
