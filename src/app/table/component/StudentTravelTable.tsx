@@ -58,8 +58,17 @@ const StudentTravelTable = () => {
       size: 80,
     },
     {
+      accessorKey: "title",
+      header: "Title",
+      size: 100,
+    },
+    {
       accessorKey: "first_name",
       header: "First Name",
+    },
+    {
+      accessorKey: "middle_name",
+      header: "Middle Name",
     },
     {
       accessorKey: "last_name",
@@ -72,6 +81,72 @@ const StudentTravelTable = () => {
     {
       accessorKey: "institute",
       header: "Institute",
+    },
+    {
+      accessorKey: "has_iacr",
+      header: "Is Presenting Paper",
+      cell: ({ row }) => {
+        const hasIacr = row.getValue("has_iacr") as string;
+        return (
+          <div className="text-sm">
+            {hasIacr === "1" ? "Yes" : hasIacr === "0" ? "No" : "-"}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "file_name",
+      header: "Uploaded Documents",
+      size: 200,
+      cell: ({ row }) => {
+        const fileName = row.getValue("file_name") as string;
+        const fileKey = row.original.file_key;
+        const [isDownloading, setIsDownloading] = React.useState(false);
+
+        const handleDownload = async () => {
+          if (isDownloading) return;
+
+          setIsDownloading(true);
+          try {
+            const response = await fetch(`/api/download?fileKey=${fileKey}`);
+            if (response.ok) {
+              const blob = await response.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.style.display = "none";
+              a.href = url;
+              a.download = fileName || "document.pdf";
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+            } else {
+              alert("Download failed");
+            }
+          } catch (error) {
+            console.error("Download error:", error);
+            alert("Download failed");
+          } finally {
+            setIsDownloading(false);
+          }
+        };
+
+        return fileName ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="text-blue-600 hover:text-blue-800 p-1 h-auto min-h-0 text-left justify-start cursor-pointer"
+          >
+            <span className="truncate max-w-[150px]" title={fileName}>
+              {isDownloading ? "Downloading..." : fileName}
+            </span>
+          </Button>
+        ) : (
+          <span className="text-gray-400">-</span>
+        );
+      },
     },
     {
       accessorKey: "create_date",

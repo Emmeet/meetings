@@ -58,8 +58,17 @@ const InvitationLetterTable = () => {
       size: 80,
     },
     {
+      accessorKey: "title",
+      header: "Title",
+      size: 100,
+    },
+    {
       accessorKey: "first_name",
       header: "First Name",
+    },
+    {
+      accessorKey: "middle_name",
+      header: "Middle Name",
     },
     {
       accessorKey: "last_name",
@@ -70,12 +79,41 @@ const InvitationLetterTable = () => {
       header: "Email",
     },
     {
+      accessorKey: "date_of_birth",
+      header: "Date of Birth",
+      cell: ({ row }) => {
+        const date = row.getValue("date_of_birth") as string;
+        return (
+          <div className="text-sm text-gray-600">
+            {date ? new Date(date).toLocaleDateString("en-UK") : "-"}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "nationality",
       header: "Nationality",
     },
     {
       accessorKey: "institute",
       header: "Institute",
+    },
+    {
+      accessorKey: "paper_title",
+      header: "Paper Title",
+    },
+    {
+      accessorKey: "academic_profile",
+      header: "Academic Profile",
+    },
+    {
+      accessorKey: "conference_interests",
+      header: "Conference Interests",
+      size: 180,
+    },
+    {
+      accessorKey: "iacr_experience",
+      header: "IACR Experience",
     },
     {
       accessorKey: "create_date",
@@ -122,7 +160,7 @@ const InvitationLetterTable = () => {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await fetch("/api/asiacrypt-visa-request/export");
+      const response = await fetch("/api/asiacrypt-visa-request/export?type=0");
       const result = await response.json();
 
       if (result.success && result.data) {
@@ -202,14 +240,6 @@ const InvitationLetterTable = () => {
               />
             </div>
           </div>
-          <Button
-            onClick={handleExport}
-            disabled={isExporting}
-            className="flex items-center space-x-2"
-          >
-            <Download className="h-4 w-4" />
-            <span>{isExporting ? "Exporting..." : "Export Excel"}</span>
-          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>

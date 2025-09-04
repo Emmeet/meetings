@@ -70,6 +70,7 @@ model asiacrypt_visa_request {
   file_key            String?  @db.VarChar(255)
   type                Int?
   create_date         DateTime? @default(now()) @db.DateTime(0)
+  send                Int?
 
   @@map("asiacrypt_visa_request")
 }
