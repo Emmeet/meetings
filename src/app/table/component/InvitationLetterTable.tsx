@@ -77,7 +77,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "email",
       header: "Email",
-      size: 200,
+      size: 220,
     },
     {
       accessorKey: "date_of_birth",
@@ -140,7 +140,16 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "conference_interests",
       header: "Conference Interests",
-      size: 180,
+      cell: ({ row }) => {
+        const value = row.getValue("conference_interests") as string;
+        const display =
+          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
+        return (
+          <div title={value} className="truncate max-w-[180px]">
+            {display || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "iacr_experience",
