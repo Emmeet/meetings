@@ -98,6 +98,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "institute",
       header: "Institute",
+      size: 220,
       cell: ({ row }) => {
         const value = row.getValue("institute") as string;
         const display =
@@ -112,6 +113,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "paper_title",
       header: "Paper Title",
+      size: 220,
       cell: ({ row }) => {
         const value = row.getValue("paper_title") as string;
         const display =
@@ -126,6 +128,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "academic_profile",
       header: "Academic Profile",
+      size: 220,
       cell: ({ row }) => {
         const value = row.getValue("academic_profile") as string;
         const display =
@@ -140,6 +143,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "conference_interests",
       header: "Conference Interests",
+      size: 220,
       cell: ({ row }) => {
         const value = row.getValue("conference_interests") as string;
         const display =
@@ -154,6 +158,17 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "iacr_experience",
       header: "IACR Experience",
+      size: 220,
+      cell: ({ row }) => {
+        const value = row.getValue("iacr_experience") as string;
+        const display =
+          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
+        return (
+          <div title={value} className="truncate max-w-[180px]">
+            {display || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "create_date",
