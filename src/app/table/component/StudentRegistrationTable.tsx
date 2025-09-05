@@ -86,6 +86,7 @@ const StudentRegistrationTable = () => {
     {
       accessorKey: "email",
       header: "Email",
+      size: 200,
     },
     {
       accessorKey: "institute",

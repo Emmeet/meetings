@@ -77,6 +77,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "email",
       header: "Email",
+      size: 200,
     },
     {
       accessorKey: "date_of_birth",
@@ -97,14 +98,44 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "institute",
       header: "Institute",
+      cell: ({ row }) => {
+        const value = row.getValue("institute") as string;
+        const display =
+          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
+        return (
+          <div title={value} className="truncate max-w-[180px]">
+            {display || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "paper_title",
       header: "Paper Title",
+      cell: ({ row }) => {
+        const value = row.getValue("paper_title") as string;
+        const display =
+          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
+        return (
+          <div title={value} className="truncate max-w-[180px]">
+            {display || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "academic_profile",
       header: "Academic Profile",
+      cell: ({ row }) => {
+        const value = row.getValue("academic_profile") as string;
+        const display =
+          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
+        return (
+          <div title={value} className="truncate max-w-[180px]">
+            {display || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "conference_interests",

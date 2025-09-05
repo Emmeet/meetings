@@ -10,6 +10,6 @@ export default function page() {
 }
 
 export const metadata: Metadata = {
-  title: "Asiacrypt 2025 Student speaker's registration wavier request",
-  description: "Asiacrypt 2025 Student speaker's registration wavier request",
+  title: "Asiacrypt 2025 Student speaker's registration waiver request",
+  description: "Asiacrypt 2025 Student speaker's registration waiver request",
 };

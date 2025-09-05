@@ -5,7 +5,7 @@ export default function Page() {
     <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">
-          AsiaCrypt 2025 - Student speaker's registration wavier request
+          AsiaCrypt 2025 - Student speaker's registration waiver request
         </h1>
       </div>
       <StudentRegistrationTable />

@@ -137,7 +137,7 @@ export function StudentRegistrationForm() {
                 <div className="flex flex-col items-center">
                   <span>AsiaCrypt 2025</span>
                   <span className="text-lg font-normal text-slate-600 mt-2">
-                    Student speaker's registration wavier request
+                    Student speaker's registration waiver request
                   </span>
                 </div>
               </CardTitle>
