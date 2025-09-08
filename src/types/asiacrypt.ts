@@ -19,6 +19,8 @@ export interface AsiacryptVisaRequest {
   file_key: string | null;
   type: number | null;
   create_date: string | null;
+  send: number | null;
+  approve: number | null;
 }
 
 export interface AsiacryptVisaRequestResponse {

@@ -71,6 +71,7 @@ model asiacrypt_visa_request {
   type                Int?
   create_date         DateTime? @default(now()) @db.DateTime(0)
   send                Int?
+  approve             Int?
 
   @@map("asiacrypt_visa_request")
 }

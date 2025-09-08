@@ -23,13 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChevronDown,
-  ChevronUp,
-  ChevronsUpDown,
-  Search,
-  Download,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronsUpDown, Search } from "lucide-react";
 import {
   AsiacryptVisaRequest,
   AsiacryptVisaRequestResponse,
@@ -52,11 +46,6 @@ const InvitationLetterTable = () => {
 
   // 定义列
   const columns: ColumnDef<AsiacryptVisaRequest>[] = [
-    {
-      accessorKey: "id",
-      header: "ID",
-      size: 80,
-    },
     {
       accessorKey: "title",
       header: "Title",
@@ -101,11 +90,9 @@ const InvitationLetterTable = () => {
       size: 220,
       cell: ({ row }) => {
         const value = row.getValue("institute") as string;
-        const display =
-          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
         return (
-          <div title={value} className="truncate max-w-[180px]">
-            {display || "-"}
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
           </div>
         );
       },
@@ -116,11 +103,9 @@ const InvitationLetterTable = () => {
       size: 220,
       cell: ({ row }) => {
         const value = row.getValue("paper_title") as string;
-        const display =
-          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
         return (
-          <div title={value} className="truncate max-w-[180px]">
-            {display || "-"}
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
           </div>
         );
       },
@@ -131,11 +116,9 @@ const InvitationLetterTable = () => {
       size: 220,
       cell: ({ row }) => {
         const value = row.getValue("academic_profile") as string;
-        const display =
-          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
         return (
-          <div title={value} className="truncate max-w-[180px]">
-            {display || "-"}
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
           </div>
         );
       },
@@ -146,11 +129,9 @@ const InvitationLetterTable = () => {
       size: 220,
       cell: ({ row }) => {
         const value = row.getValue("conference_interests") as string;
-        const display =
-          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
         return (
-          <div title={value} className="truncate max-w-[180px]">
-            {display || "-"}
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
           </div>
         );
       },
@@ -161,11 +142,9 @@ const InvitationLetterTable = () => {
       size: 220,
       cell: ({ row }) => {
         const value = row.getValue("iacr_experience") as string;
-        const display =
-          value && value.length > 20 ? value.slice(0, 20) + "..." : value;
         return (
-          <div title={value} className="truncate max-w-[180px]">
-            {display || "-"}
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
           </div>
         );
       },
@@ -182,7 +161,120 @@ const InvitationLetterTable = () => {
         );
       },
     },
+    // Actions column
+    {
+      id: "actions",
+      header: "Actions",
+      size: 210,
+      cell: ({ row }) => {
+        const send = row.original.send;
+        // 审批按钮
+        const approve = row.original.approve;
+        return (
+          <div className="flex flex-row gap-2 min-w-[210px] items-center">
+            {send === 0 ? (
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => handleSendEmail(row.original)}
+                disabled={sendingId === row.original.id}
+              >
+                {sendingId === row.original.id ? "Sending..." : "Send Email"}
+              </Button>
+            ) : (
+              <div className="relative group">
+                <Button size="sm" variant="outline" disabled>
+                  Sent
+                </Button>
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Email has been sent
+                </span>
+              </div>
+            )}
+            {approve === 0 ? (
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => handleApprove(row.original)}
+                disabled={approvingId === row.original.id}
+              >
+                {approvingId === row.original.id ? "Approving..." : "Approve"}
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" disabled>
+                Approved
+              </Button>
+            )}
+          </div>
+        );
+      },
+    },
   ];
+
+  const [sendingId, setSendingId] = useState<number | null>(null);
+  const [approvingId, setApprovingId] = useState<number | null>(null);
+
+  const handleApprove = async (row: AsiacryptVisaRequest) => {
+    if (!window.confirm("Are you sure you want to approve this request?"))
+      return;
+    setApprovingId(row.id);
+    try {
+      const res = await fetch("/api/asiacrypt-visa-request/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: row.id }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert("Request approved successfully!");
+        fetchData(); // refresh table
+      } else {
+        alert(result.error || "Failed to approve request");
+      }
+    } catch (error) {
+      alert("Failed to approve request");
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleSendEmail = async (row: AsiacryptVisaRequest) => {
+    if (!window.confirm("Are you sure you want to send the email?")) return;
+    setSendingId(row.id);
+    try {
+      const payload = {
+        id: row.id,
+        fullName: `${row.first_name || ""} ${row.middle_name || ""} ${
+          row.last_name || ""
+        }`
+          .replace(/\s+/g, " ")
+          .trim(),
+        nationality: row.nationality,
+        institute: row.institute,
+        acceptedPaper: row.paper_title,
+        birthDate: row.date_of_birth
+          ? new Date(row.date_of_birth).toLocaleDateString("en-GB")
+          : "",
+        email: row.email,
+      };
+      const res = await fetch("/api/asiacrypt-visa-request/send-letter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert("Email sent successfully!");
+        fetchData(); // refresh table
+      } else {
+        alert(result.error || "Failed to send email");
+      }
+    } catch (error) {
+      alert("Failed to send email");
+    } finally {
+      setSendingId(null);
+    }
+  };
 
   // 获取数据
   const fetchData = async () => {
@@ -298,7 +390,7 @@ const InvitationLetterTable = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table style={{ tableLayout: "fixed", width: "100%" }}>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -311,6 +403,15 @@ const InvitationLetterTable = () => {
                           width: header.getSize(),
                           minWidth: header.getSize(),
                           maxWidth: header.getSize(),
+                          position:
+                            header.column.id === "actions"
+                              ? "sticky"
+                              : undefined,
+                          right: header.column.id === "actions" ? 0 : undefined,
+                          zIndex:
+                            header.column.id === "actions" ? 2 : undefined,
+                          background:
+                            header.column.id === "actions" ? "#fff" : undefined,
                         }}
                       >
                         {header.isPlaceholder ? null : (
@@ -367,6 +468,12 @@ const InvitationLetterTable = () => {
                           width: cell.column.getSize(),
                           minWidth: cell.column.getSize(),
                           maxWidth: cell.column.getSize(),
+                          position:
+                            cell.column.id === "actions" ? "sticky" : undefined,
+                          right: cell.column.id === "actions" ? 0 : undefined,
+                          zIndex: cell.column.id === "actions" ? 1 : undefined,
+                          background:
+                            cell.column.id === "actions" ? "#fff" : undefined,
                         }}
                       >
                         {flexRender(
