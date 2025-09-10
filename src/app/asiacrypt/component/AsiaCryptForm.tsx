@@ -48,7 +48,7 @@ const formSchema = z
     nationality: z.string().min(1, "This field is required."),
     institute: z.string().min(1, "This field is required."),
     paperTitle: z.string().optional(),
-    academicProfile: z.string().optional(),
+    academicProfile: z.string().min(1, "This field is required."),
     conferenceInterests: z.string().min(1, "This field is required."),
     iacrExperience: z.string().min(1, "This field is required."),
   })
@@ -421,7 +421,7 @@ export function AsiaCryptForm() {
                         <FormLabel>
                           Provide a link to your up-to-date Curriculum Vitae
                           (CV) that includes, if applicable, a list of
-                          publications
+                          publications <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
