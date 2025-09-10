@@ -191,9 +191,7 @@ const InvitationLetterTable = () => {
                 onClick={() => handleApprove(row.original)}
                 disabled={approvingId === row.original.id}
               >
-                {approvingId === row.original.id
-                  ? "Approving..."
-                  : "Pending Approval"}
+                {approvingId === row.original.id ? "Approving..." : "Pending"}
               </Button>
             ) : (
               <Button
