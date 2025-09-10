@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id } = body;
+    const { id, approve } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // 更新数据库 approve 字段
     await prisma.asiacrypt_visa_request.update({
       where: { id },
-      data: { approve: 1 },
+      data: { approve },
     });
 
     return NextResponse.json({ success: true });

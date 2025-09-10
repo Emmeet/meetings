@@ -172,25 +172,18 @@ const InvitationLetterTable = () => {
         const approve = row.original.approve;
         return (
           <div className="flex flex-row gap-2 min-w-[210px] items-center">
-            {send === 0 ? (
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => handleSendEmail(row.original)}
-                disabled={sendingId === row.original.id}
-              >
-                {sendingId === row.original.id ? "Sending..." : "Send Email"}
-              </Button>
-            ) : (
-              <div className="relative group">
-                <Button size="sm" variant="outline" disabled>
-                  Sent
-                </Button>
-                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Email has been sent
-                </span>
-              </div>
-            )}
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => handleSendEmail(row.original)}
+              disabled={sendingId === row.original.id}
+            >
+              {sendingId === row.original.id
+                ? "Sending..."
+                : send === 0
+                ? "Send Email"
+                : "Resend"}
+            </Button>
             {approve === 0 ? (
               <Button
                 size="sm"
@@ -198,11 +191,18 @@ const InvitationLetterTable = () => {
                 onClick={() => handleApprove(row.original)}
                 disabled={approvingId === row.original.id}
               >
-                {approvingId === row.original.id ? "Approving..." : "Approve"}
+                {approvingId === row.original.id
+                  ? "Approving..."
+                  : "Pending Approval"}
               </Button>
             ) : (
-              <Button size="sm" variant="outline" disabled>
-                Approved
+              <Button
+                onClick={() => handleApprove(row.original)}
+                disabled={approvingId === row.original.id}
+                size="sm"
+                variant="outline"
+              >
+                {approvingId === row.original.id ? "Pending..." : "Approved"}
               </Button>
             )}
           </div>
@@ -215,19 +215,20 @@ const InvitationLetterTable = () => {
   const [approvingId, setApprovingId] = useState<number | null>(null);
 
   const handleApprove = async (row: AsiacryptVisaRequest) => {
-    if (!window.confirm("Are you sure you want to approve this request?"))
-      return;
     setApprovingId(row.id);
     try {
       const res = await fetch("/api/asiacrypt-visa-request/approve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: row.id }),
+        body: JSON.stringify({
+          id: row.id,
+          approve: row.approve === 1 ? 0 : 1,
+        }),
       });
       const result = await res.json();
       if (result.success) {
         alert("Request approved successfully!");
-        fetchData(); // refresh table
+        fetchData();
       } else {
         alert(result.error || "Failed to approve request");
       }
