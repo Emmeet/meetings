@@ -174,6 +174,7 @@ const InvitationLetterTable = () => {
           <div className="flex flex-row gap-2 min-w-[210px] items-center">
             <Button
               size="sm"
+              className="cursor-pointer"
               variant="default"
               onClick={() => handleSendEmail(row.original)}
               disabled={sendingId === row.original.id}
@@ -187,6 +188,7 @@ const InvitationLetterTable = () => {
             {approve === 0 ? (
               <Button
                 size="sm"
+                className="cursor-pointer"
                 variant="default"
                 onClick={() => handleApprove(row.original)}
                 disabled={approvingId === row.original.id}
@@ -198,6 +200,7 @@ const InvitationLetterTable = () => {
                 onClick={() => handleApprove(row.original)}
                 disabled={approvingId === row.original.id}
                 size="sm"
+                className="cursor-pointer"
                 variant="outline"
               >
                 {approvingId === row.original.id ? "Pending..." : "Approved"}
