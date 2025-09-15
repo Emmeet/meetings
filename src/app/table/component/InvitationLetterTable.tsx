@@ -66,7 +66,7 @@ const InvitationLetterTable = () => {
     {
       accessorKey: "email",
       header: "Email",
-      size: 220,
+      size: 250,
     },
     {
       accessorKey: "date_of_birth",
