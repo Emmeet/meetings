@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
       !fullName ||
       !nationality ||
       !institute ||
-      !acceptedPaper ||
       !birthDate ||
       !email ||
       !id
