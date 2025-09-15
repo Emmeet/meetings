@@ -47,10 +47,13 @@ const formSchema = z
     }),
     nationality: z.string().min(1, "This field is required."),
     institute: z.string().min(1, "This field is required."),
-    paperTitle: z.string().optional(),
+    paperTitle: z.string().optional(), // 先设为可选，后面用refine实现条件必填
     academicProfile: z.string().min(1, "This field is required."),
     conferenceInterests: z.string().min(1, "This field is required."),
     iacrExperience: z.string().min(1, "This field is required."),
+    author: z.enum(["0", "1"], {
+      message: "You need to select.",
+    }),
   })
   .refine(
     (data) => {
@@ -62,6 +65,18 @@ const formSchema = z
     {
       message: "Field is required.",
       path: ["otherTitle"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.author === "1") {
+        return data.paperTitle && data.paperTitle.trim() !== "";
+      }
+      return true;
+    },
+    {
+      message: "Paper title is required for authors.",
+      path: ["paperTitle"],
     }
   );
 
@@ -90,6 +105,7 @@ export function AsiaCryptForm() {
 
   // 监听表单值的变化
   const title = form.watch("title");
+  const author = form.watch("author");
 
   // Form submission handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -391,26 +407,61 @@ export function AsiaCryptForm() {
                     )}
                   />
 
-                  {/* Paper Title */}
+                  {/* Paper Type */}
                   <FormField
                     control={form.control}
-                    name="paperTitle"
+                    name="author"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="space-y-3">
                         <FormLabel>
-                          The title of your paper at Asiacrypt 2025, if
-                          applicable
+                          Are you an author？{" "}
+                          <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Enter your paper title"
-                            {...field}
-                          />
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            className="flex flex-col space-y-1"
+                          >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="1" />
+                              </FormControl>
+                              <FormLabel className="font-normal">Yes</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="0" />
+                              </FormControl>
+                              <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                          </RadioGroup>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  {/* Paper Title */}
+                  {author === "1" && (
+                    <FormField
+                      control={form.control}
+                      name="paperTitle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            The title of your paper at Asiacrypt 2025, if
+                            applicable <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your paper title"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   {/* Academic Profile */}
                   <FormField
