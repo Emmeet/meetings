@@ -82,15 +82,33 @@ const StudentRegistrationTable = () => {
     {
       accessorKey: "paper_title",
       header: "Paper Title",
+      size: 220,
+      cell: ({ row }) => {
+        const value = row.getValue("paper_title") as string;
+        return (
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "email",
       header: "Email",
-      size: 200,
+      size: 250,
     },
     {
       accessorKey: "institute",
       header: "Institute",
+      size: 220,
+      cell: ({ row }) => {
+        const value = row.getValue("institute") as string;
+        return (
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "has_iacr",

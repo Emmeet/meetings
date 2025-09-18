@@ -23,7 +23,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, ChevronsUpDown, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Search,
+  CheckIcon,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AsiacryptVisaRequest,
   AsiacryptVisaRequestResponse,
@@ -93,6 +105,19 @@ const InvitationLetterTable = () => {
         return (
           <div className="whitespace-pre-wrap break-words min-h-[24px]">
             {value || "-"}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "author",
+      header: "Author",
+      size: 100,
+      cell: ({ row }) => {
+        const value = row.getValue("author") as number;
+        return (
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value === 1 ? "Yes" : "No"}
           </div>
         );
       },
@@ -185,27 +210,59 @@ const InvitationLetterTable = () => {
                 ? "Send Email"
                 : "Resend"}
             </Button>
-            {approve === 0 ? (
-              <Button
-                size="sm"
-                className="cursor-pointer"
-                variant="default"
-                onClick={() => handleApprove(row.original)}
-                disabled={approvingId === row.original.id}
-              >
-                {approvingId === row.original.id ? "Approving..." : "Pending"}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => handleApprove(row.original)}
-                disabled={approvingId === row.original.id}
-                size="sm"
-                className="cursor-pointer"
-                variant="outline"
-              >
-                {approvingId === row.original.id ? "Pending..." : "Approved"}
-              </Button>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="cursor-pointer"
+                  variant={
+                    approve === 1
+                      ? "outline"
+                      : approve === 2
+                      ? "destructive"
+                      : "default"
+                  }
+                  disabled={approvingId === row.original.id}
+                >
+                  {approvingId === row.original.id
+                    ? "Processing..."
+                    : approve === 1
+                    ? "Approved"
+                    : approve === 2
+                    ? "Rejected"
+                    : "Pending"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => handleApprove(row.original, 1)}
+                  disabled={approve === 1 || approvingId === row.original.id}
+                >
+                  Approve
+                  {approve === 1 && (
+                    <CheckIcon className="ml-2 h-4 w-4 text-green-500" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleApprove(row.original, 2)}
+                  disabled={approve === 2 || approvingId === row.original.id}
+                >
+                  Reject
+                  {approve === 2 && (
+                    <CheckIcon className="ml-2 h-4 w-4 text-red-500" />
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleApprove(row.original, 0)}
+                  disabled={approve === 0 || approvingId === row.original.id}
+                >
+                  Pending
+                  {approve === 0 && (
+                    <CheckIcon className="ml-2 h-4 w-4 text-gray-400" />
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         );
       },
@@ -215,7 +272,7 @@ const InvitationLetterTable = () => {
   const [sendingId, setSendingId] = useState<number | null>(null);
   const [approvingId, setApprovingId] = useState<number | null>(null);
 
-  const handleApprove = async (row: AsiacryptVisaRequest) => {
+  const handleApprove = async (row: AsiacryptVisaRequest, status: number) => {
     setApprovingId(row.id);
     try {
       const res = await fetch("/api/asiacrypt-visa-request/approve", {
@@ -223,18 +280,24 @@ const InvitationLetterTable = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: row.id,
-          approve: row.approve === 1 ? 0 : 1,
+          approve: status,
         }),
       });
       const result = await res.json();
       if (result.success) {
-        alert("Request approved successfully!");
+        let message =
+          status === 1
+            ? "Request approved successfully!"
+            : status === 2
+            ? "Request rejected successfully!"
+            : "Status set to pending successfully!";
+        alert(message);
         fetchData();
       } else {
-        alert(result.error || "Failed to approve request");
+        alert(result.error || "Failed to update status");
       }
     } catch (error) {
-      alert("Failed to approve request");
+      alert("Failed to update status");
     } finally {
       setApprovingId(null);
     }

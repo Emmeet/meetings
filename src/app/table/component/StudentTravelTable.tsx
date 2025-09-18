@@ -77,10 +77,20 @@ const StudentTravelTable = () => {
     {
       accessorKey: "email",
       header: "Email",
+      size: 250,
     },
     {
       accessorKey: "institute",
       header: "Institute",
+      size: 220,
+      cell: ({ row }) => {
+        const value = row.getValue("institute") as string;
+        return (
+          <div className="whitespace-pre-wrap break-words min-h-[24px]">
+            {value || "-"}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "has_iacr",
