@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Toaster, toast } from "sonner";
 import {
   ChevronDown,
   ChevronUp,
@@ -291,7 +292,7 @@ const InvitationLetterTable = () => {
             : status === 2
             ? "Request rejected successfully!"
             : "Status set to pending successfully!";
-        alert(message);
+        toast.success(message);
         fetchData();
       } else {
         alert(result.error || "Failed to update status");
@@ -438,177 +439,186 @@ const InvitationLetterTable = () => {
   });
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={globalFilter ?? ""}
-                onChange={(event) => setGlobalFilter(event.target.value)}
-                className="pl-8 w-[300px]"
-              />
+    <>
+      <Toaster position="top-center" richColors />
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search..."
+                  value={globalFilter ?? ""}
+                  onChange={(event) => setGlobalFilter(event.target.value)}
+                  className="pl-8 w-[300px]"
+                />
+              </div>
             </div>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border overflow-x-auto">
-          <Table style={{ tableLayout: "fixed", width: "100%" }}>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead
-                        key={header.id}
-                        style={{
-                          width: header.getSize(),
-                          minWidth: header.getSize(),
-                          maxWidth: header.getSize(),
-                          position:
-                            header.column.id === "actions"
-                              ? "sticky"
-                              : undefined,
-                          right: header.column.id === "actions" ? 0 : undefined,
-                          zIndex:
-                            header.column.id === "actions" ? 2 : undefined,
-                          background:
-                            header.column.id === "actions" ? "#fff" : undefined,
-                        }}
-                      >
-                        {header.isPlaceholder ? null : (
-                          <div
-                            className={`flex items-center space-x-1 ${
-                              header.column.getCanSort()
-                                ? "cursor-pointer select-none"
-                                : ""
-                            }`}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {header.column.getCanSort() && (
-                              <div className="flex flex-col">
-                                {{
-                                  asc: <ChevronUp className="h-3 w-3" />,
-                                  desc: <ChevronDown className="h-3 w-3" />,
-                                }[header.column.getIsSorted() as string] ?? (
-                                  <ChevronsUpDown className="h-3 w-3" />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        style={{
-                          width: cell.column.getSize(),
-                          minWidth: cell.column.getSize(),
-                          maxWidth: cell.column.getSize(),
-                          position:
-                            cell.column.id === "actions" ? "sticky" : undefined,
-                          right: cell.column.id === "actions" ? 0 : undefined,
-                          zIndex: cell.column.id === "actions" ? 1 : undefined,
-                          background:
-                            cell.column.id === "actions" ? "#fff" : undefined,
-                        }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border overflow-x-auto">
+            <Table style={{ tableLayout: "fixed", width: "100%" }}>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead
+                          key={header.id}
+                          style={{
+                            width: header.getSize(),
+                            minWidth: header.getSize(),
+                            maxWidth: header.getSize(),
+                            position:
+                              header.column.id === "actions"
+                                ? "sticky"
+                                : undefined,
+                            right:
+                              header.column.id === "actions" ? 0 : undefined,
+                            zIndex:
+                              header.column.id === "actions" ? 2 : undefined,
+                            background:
+                              header.column.id === "actions"
+                                ? "#fff"
+                                : undefined,
+                          }}
+                        >
+                          {header.isPlaceholder ? null : (
+                            <div
+                              className={`flex items-center space-x-1 ${
+                                header.column.getCanSort()
+                                  ? "cursor-pointer select-none"
+                                  : ""
+                              }`}
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                              {header.column.getCanSort() && (
+                                <div className="flex flex-col">
+                                  {{
+                                    asc: <ChevronUp className="h-3 w-3" />,
+                                    desc: <ChevronDown className="h-3 w-3" />,
+                                  }[header.column.getIsSorted() as string] ?? (
+                                    <ChevronsUpDown className="h-3 w-3" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No data available
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                ) : table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          style={{
+                            width: cell.column.getSize(),
+                            minWidth: cell.column.getSize(),
+                            maxWidth: cell.column.getSize(),
+                            position:
+                              cell.column.id === "actions"
+                                ? "sticky"
+                                : undefined,
+                            right: cell.column.id === "actions" ? 0 : undefined,
+                            zIndex:
+                              cell.column.id === "actions" ? 1 : undefined,
+                            background:
+                              cell.column.id === "actions" ? "#fff" : undefined,
+                          }}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No data available
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
-        {/* 分页控件 */}
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            Total {total} records, Page {pagination.pageIndex + 1} of{" "}
-            {totalPages}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <div className="flex items-center space-x-1">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageNumber = i + 1;
-                return (
-                  <Button
-                    key={pageNumber}
-                    variant={
-                      pagination.pageIndex + 1 === pageNumber
-                        ? "default"
-                        : "outline"
-                    }
-                    size="sm"
-                    onClick={() => table.setPageIndex(pageNumber - 1)}
-                  >
-                    {pageNumber}
-                  </Button>
-                );
-              })}
+          {/* 分页控件 */}
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Total {total} records, Page {pagination.pageIndex + 1} of{" "}
+              {totalPages}
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pageNumber = i + 1;
+                  return (
+                    <Button
+                      key={pageNumber}
+                      variant={
+                        pagination.pageIndex + 1 === pageNumber
+                          ? "default"
+                          : "outline"
+                      }
+                      size="sm"
+                      onClick={() => table.setPageIndex(pageNumber - 1)}
+                    >
+                      {pageNumber}
+                    </Button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
