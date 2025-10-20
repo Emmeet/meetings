@@ -1,4 +1,4 @@
-FROM node:22-alpine3.19 AS base
+FROM onedev.huazuobiao.com/huazuobiao-backend/node:22-alpine3.19 AS base
 RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm
 
@@ -42,7 +42,7 @@ RUN pnpm exec prisma generate
 RUN pnpm run build
 
 # 生产镜像
-FROM node:22-alpine3.19 AS runner
+FROM onedev.huazuobiao.com/huazuobiao-backend/node:22-alpine3.19 AS runner
 RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm
 
