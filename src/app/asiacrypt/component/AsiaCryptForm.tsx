@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CheckCircle, Calendar } from "lucide-react";
+import { CalendarIcon, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -320,52 +321,63 @@ export function AsiaCryptForm() {
                     control={form.control}
                     name="dateOfBirth"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Date of birth <span className="text-red-500">*</span>
-                        </FormLabel>
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Date of birth</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
                                 variant={"outline"}
                                 className={cn(
-                                  "w-full pl-3 text-left font-normal",
+                                  "pl-3 text-left font-normal",
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "dd/MM/yyyy")
+                                  format(field.value, "PPP")
                                 ) : (
-                                  <span>26/08/2025</span>
+                                  <span>Pick a date</span>
                                 )}
-                                <Calendar className="ml-auto h-4 w-4 opacity-50" />
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
-                            <div className="p-4">
-                              <Input
-                                type="date"
-                                value={
-                                  field.value
-                                    ? format(field.value, "yyyy-MM-dd")
-                                    : ""
-                                }
-                                onChange={(e) => {
-                                  const date = e.target.value
-                                    ? new Date(e.target.value)
-                                    : undefined;
-                                  field.onChange(date);
-                                }}
-                              />
-                            </div>
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() ||
+                                date < new Date("1900-01-01")
+                              }
+                              captionLayout="dropdown"
+                            />
                           </PopoverContent>
                         </Popover>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  {/* <FormField
+                    control={form.control}
+                    name="dateOfBirth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Date of birth <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /> */}
 
                   {/* Nationality */}
                   <FormField
