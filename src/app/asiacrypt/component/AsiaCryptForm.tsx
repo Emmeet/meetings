@@ -112,6 +112,11 @@ export function AsiaCryptForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
+      const date = new Date(values.dateOfBirth);
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const day = date.getDate().toString().padStart(2, "0");
+      const dateString = `${year}-${month}-${day}`;
 
       const response = await fetch("/api/asiacrypt-visa-request", {
         method: "POST",
@@ -120,7 +125,7 @@ export function AsiaCryptForm() {
         },
         body: JSON.stringify({
           ...values,
-          dateOfBirth: values.dateOfBirth.toISOString(),
+          dateOfBirth: dateString,
           type: 0,
         }),
       });
